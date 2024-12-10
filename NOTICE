@@ -1,0 +1,26 @@
+Copyright (C) 2024 AIDC-AI
+This project is licensed under Apache License 2.0(http://www.apache.org/licenses/LICENSE-2.0, SPDX-License-identifier: Apache-2.0). As a special exception, the dataset ARC is licensed under cc-by-sa-4.0 (https://creativecommons.org/licenses/by-sa/4.0/legalcode, SPDX-License-Identifier: CC-BY-SA-4.0). 
+
+This project incorporates components from the Open Source Software below. 
+The original copyright notices and the licenses under which we received such components are set forth below for informational purposes. 
+lm-evaluation-harness
+Copyright (c) 2020 EleutherAI
+MIT License (https://github.com/EleutherAI/lm-evaluation-harness/blob/main/LICENSE.md)
+
+VLMEvalKit
+Copyright 2023 VLMEvalKit Authors
+Apache-2.0 license (https://github.com/open-compass/VLMEvalKit/blob/main/LICENSE)
+
+The following files were modified by AIDC-AI:
+1. lm-evaluation-harness, path: evals/base.py, dataloaders/truthfulqa_mc2.py
+MIT License (https://github.com/EleutherAI/lm-evaluation-harness/blob/main/LICENSE.md)
+2. VLMEvalKit, path: dataloaders/ocrbench.py
+Apache-2.0 license (https://github.com/open-compass/VLMEvalKit/blob/main/LICENSE)
+
+This project also incorporates datasets modified from the following third-party datasets (form of the files adapted only):
+1. MMLU (https://github.com/hendrycks/test), under MIT (https://github.com/hendrycks/test/blob/master/LICENSE, SPDX-License-Identifier: MIT). 
+2. ARC (https://huggingface.co/datasets/allenai/ai2_arc), under cc-by-sa-4.0 (https://huggingface.co/datasets/choosealicense/licenses/blob/main/markdown/cc-by-sa-4.0.md, SPDX-License-Identifier: CC-BY-SA-4.0). 
+3. BBH (https://github.com/suzgunmirac/BIG-Bench-Hard), under MIT (https://github.com/suzgunmirac/BIG-Bench-Hard/blob/main/LICENSE, SPDX-License-Identifier: MIT). 
+4. ANLI (https://github.com/facebookresearch/anli), under Creative Commons Attribution Non Commercial 4.0 International (https://github.com/facebookresearch/anli/blob/main/LICENSE, SPDX-License-Identifier: CC-BY-NC-4.0). 
+5. HellaSwag (https://github.com/rowanz/hellaswag/tree/master/data), under MIT (https://github.com/rowanz/hellaswag/blob/master/LICENSE, SPDX-License-Identifier: MIT). 
+6. TruthfulQA (https://github.com/sylinrl/TruthfulQA), under Apache License 2.0 (https://github.com/sylinrl/TruthfulQA/blob/main/LICENSE, SPDX-License-Identifier: Apache-2.0). 

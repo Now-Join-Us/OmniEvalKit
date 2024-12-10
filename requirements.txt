@@ -1,0 +1,14 @@
+transformers==4.42.3
+evaluate
+accelerate
+tiktoken
+protobuf
+psutil
+sentencepiece
+numpy
+tqdm
+einops
+transformers_stream_generator
+pycocoevalcap
+bitsandbytes
+pytest

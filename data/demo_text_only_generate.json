@@ -1,0 +1,32 @@
+[
+    {
+        "category": "demo_class_1",
+        "request_type": "generate_until",
+        "raw_instruction": "demo raw question 1",
+        "prompt_instruction": "Question: demo raw question 1, demo demo?",
+        "gold": "aaa bbbbb",
+        "id": "demo_text_only_generate_until_dataset_000000",
+        "name": "demo_text_only_generate_until_dataset",
+        "question_type": "open"
+    },
+    {
+        "category": "demo_class_2",
+        "request_type": "generate_until",
+        "raw_instruction": "demo raw question 2",
+        "prompt_instruction": "Question: demo raw question 2, demo demo?",
+        "gold": "ccccc ddd",
+        "id": "demo_text_only_generate_until_dataset_000001",
+        "name": "demo_text_only_generate_until_dataset",
+        "question_type": "open"
+    },
+    {
+        "category": "demo_class_2",
+        "request_type": "generate_until",
+        "raw_instruction": "demo raw question 3",
+        "prompt_instruction": "Question: demo raw question 3, demo demo?",
+        "gold": "eeeeee ff",
+        "id": "demo_text_only_generate_dataset_000002",
+        "name": "demo_text_only_generate_until_dataset",
+        "question_type": "open"
+    }
+]

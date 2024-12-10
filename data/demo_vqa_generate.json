@@ -1,0 +1,59 @@
+[
+    {
+        "category": "demo_class_1",
+        "raw_instruction": "demo raw question 1",
+        "request_type": "generate_until",
+        "choices": [
+            "xxxxxxxxx",
+            "xxx",
+            "xxxxx"
+        ],
+        "prompt_instruction": null,
+        "gold": 0,
+        "image_path": [
+            "red.jpg"
+        ],
+        "difficulty": "easy",
+        "id": "demo_vqa_generate_dataset_000000",
+        "name": "demo_vqa_generate_dataset",
+        "question_type": "multiple_choice"
+    },
+    {
+        "category": "demo_class_2",
+        "raw_instruction": "demo raw question 2",
+        "request_type": "generate_until",
+        "choices": [
+            "xxxxxx",
+            "xxxxxxxx",
+            "xxxxxxx"
+        ],
+        "prompt_instruction": null,
+        "gold": 0,
+        "image_path": [
+            "blue.jpg"
+        ],
+        "difficulty": "easy",
+        "id": "demo_vqa_generate_dataset_000001",
+        "name": "demo_vqa_generate_dataset",
+        "question_type": "multiple_choice"
+    },
+    {
+        "category": "demo_class_2",
+        "raw_instruction": "demo raw question 3",
+        "request_type": "generate_until",
+        "choices": [
+            "xxxxxxxxx",
+            "xxx",
+            "xxxxx"
+        ],
+        "prompt_instruction": null,
+        "gold": 0,
+        "image_path": [
+            "orange.jpg"
+        ],
+        "difficulty": "easy",
+        "id": "demo_vqa_generate_dataset_000002",
+        "name": "demo_vqa_generate_dataset",
+        "question_type": "multiple_choice"
+    }
+]
