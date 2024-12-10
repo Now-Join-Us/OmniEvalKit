@@ -2,8 +2,6 @@
     &nbspEnglish&nbsp | &nbsp; <a href="README_CN.md">中文</a>
 </p>
 <br>
-<br>
-</br>
 </br>
 
 </div>
@@ -14,8 +12,8 @@
   <h3 align="center">M<sup>3</sup>Bench: A Modular, Lightweight Toolbox for Evaluating LLM<br>and its Multilingual, Multidomain, Multimodal Extensions</h3>
 </div>
 <p align="center">
-📝 <a href="https://arxiv.org/abs/2406.03496" target="_blank">Paper</a>
-</p> 
+📝 <a href="https://arxiv.org/abs/2412.06693" target="_blank">Paper</a>
+</p>
 
 <p align="center">
     🚀 Ask questions or discuss ideas on <a href="https://github.com/AIDC-AI/M3Bench/discussions" target="_blank"> GitHub </a>
