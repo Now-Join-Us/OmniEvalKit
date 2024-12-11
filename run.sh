@@ -4,12 +4,10 @@ export text_only__datasets='arc_challenge_25,arc_easy_25,boolq,cmmlu,mmlu_5,open
 export text_only__datasets='demo_text_only_generate,demo_text_only_multiple_choice'
 export multimodal_datasets='demo_vqa_generate'
 
-CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Phi-3.5-vision-instruct --model_args device_map:cuda,trust_remote_code:True,torch_dtype:auto,_attn_implementation:flash_attention_2 --tokenizer_args trust_remote_code:True,num_crops:4 --time_str 03_26
-
-
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Phi-3.5-vision-instruct --model_args device_map:cuda,trust_remote_code:True,torch_dtype:auto,_attn_implementation:flash_attention_2 --tokenizer_args trust_remote_code:True,num_crops:4 --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model MiniCPM-V-2_6 --model_args device_map:cuda,trust_remote_code:True,torch_dtype:torch.float16 --tokenizer_args trust_remote_code:True --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $text_only__datasets --model Meta-Llama-3-8B-Instruct --model_args torch_dtype:torch.bfloat16,device_map:auto --time_str 03_26_00_00_00
+CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Meta-Llama-3.1-8B-Instruct --model_args torch_dtype:torch.bfloat16,device_map:auto --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $text_only__datasets --model Baichuan-7B --model_args device_map:auto,trust_remote_code:True --tokenizer_args trust_remote_code:True --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $text_only__datasets --model Baichuan2-7B-Chat --model_args device_map:auto,torch_dtype:torch.bfloat16,trust_remote_code:True --tokenizer_args use_fast:False,trust_remote_code:True --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Bunny-Llama-3-8B-V --model_args torch_dtype:torch.float16,device_map:auto,trust_remote_code:True --tokenizer_args trust_remote_code:True --time_str 03_26_00_00_00
@@ -106,3 +104,4 @@ CUDA_VISIBLE_DEVICES="0" python main.py --data $text_only__datasets --model zeph
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Ovis-Clip-Qwen1_5-7B --model_args torch_dtype:torch.bfloat16,multimodal_max_length:8192,trust_remote_code:True --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Ovis-Clip-Llama3-8B --model_args torch_dtype:torch.bfloat16,multimodal_max_length:8192,trust_remote_code:True --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $text_only__datasets --model Qwen2-72B-Instruct --model_args torch_dtype:torch.bfloat16,device_map:auto --time_str 03_26_00_00_00
+CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Wings --model_args trust_remote_code:True --model_args json_path:path_of_args.json --time_str 03_26_00_00_00

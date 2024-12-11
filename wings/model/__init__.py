@@ -1,0 +1,3 @@
+from .modeling_llava_qwen2 import LlavaQwen2ForCausalLM, LlavaQwen2Config
+from .modeling_wings_qwen2 import WingsQwen2ForCausalLM, WingsQwen2Config
+from .modeling_wings_llama import WingsLlamaForCausalLM, WingsLlamaConfig

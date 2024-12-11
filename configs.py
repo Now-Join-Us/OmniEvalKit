@@ -8,7 +8,6 @@ MODEL_PATH = 'your_models_path/models'
 DATA_PATH = './data'
 OUTPUT_PATH = 'your_outputs_path/outputs'
 
-
 datasets = \
     ['hellaswag', 'mmlu', 'arc_challenge', 'arc_easy', 'winogrande', 'truthfulqa_mc1', 'truthfulqa_mc2', 'aclue', 'anli', 'boolq', 'cb', 'cmmlu', 'cola', 'crows_pairs', 'copa', 'glue', 'lambada', 'mathqa', 'mnli', 'mrpc', 'openbookqa', 'piqa'] + \
         ['bbh', 'gsm8k', 'drop', 'logieval', 'eq_bench', 'nq_open', 'realworldqa'] + \
@@ -25,6 +24,7 @@ _MODULE2MODEL = {
     'multimodal_llm.thudm.glm_4v': ['glm-4v-9b'],
     'multimodal_llm.qwen.qwen_vl': ['Qwen-VL'],
     'multimodal_llm.qwen.qwen_vl_chat': ['Qwen-VL-Chat'],
+    'multimodal_llm.qwen.qwen2_vl_instruct': ['Qwen2-VL-7B-Instruct'],
     'multimodal_llm.01_ai.yi_vl': ['Yi-VL-6B'],
     'multimodal_llm.microsoft.phi3_vision': ['Phi-3-vision-128k-instruct', 'Phi-3.5-vision-instruct'],
     'multimodal_llm.microsoft.e5_v': ['e5-v'],
@@ -39,9 +39,11 @@ _MODULE2MODEL = {
     'multimodal_llm.aidc_ai.ovis1_6': ['Ovis1.6-Gemma2-9B'],
     'multimodal_llm.internlm.internlm_xcomposer2': ['internlm-xcomposer2-vl-1_8b', 'internlm-xcomposer2-vl-7b', 'internlm-xcomposer2-7b'],
     'multimodal_llm.lamda_llm.wings': ['Wings'],
+    'multimodal_llm.opengvlab.internvl2': ['InternVL2-8B'],
     'llm.qwen.qwen1_5_chat': ['Qwen1.5-0.5B-Chat', 'Qwen1.5-1.8B-Chat', 'Qwen1.5-4B-Chat', 'Qwen1.5-MoE-A2.7B-Chat', 'Qwen1.5-7B-Chat', 'Qwen2-0.5B-Instruct', 'Qwen2-1.5B-Instruct', 'Qwen2-7B-Instruct', 'Qwen2-72B-Instruct'],
     'llm.qwen.qwen_base': ['Qwen-1_8B', 'Qwen-7B'],
     'llm.qwen.qwen_chat': ['Qwen-1_8B-Chat', 'Qwen-7B-Chat'],
+    'llm.qwen.qwen2_5_chat': ['Qwen2.5-7B-Instruct'],
     'llm.01_ai.yi_chat': ['Yi-1.5-6B-Chat', 'Yi-1.5-9B-Chat', 'Yi-6B-Chat'],
     'llm.deepseek_ai.deepseek_llm': ['deepseek-llm-7b-chat'],
     'llm.internlm.internlm_chat': ['internlm2-chat-7b', 'internlm-chat-7b'],
@@ -66,6 +68,7 @@ _MODULE2MODEL = {
     'llm.xenon1.metamodel_moex8': ['MetaModel_moex8'],
     'llm.togethercomputer.redpajama': ['RedPajama-INCITE-Chat-3B-v1'],
     'llm.openai.gpt': ['gpt-4-turbo-128k', 'gpt-4o-0513'],
+    'llm.openai.gpt_api': ['gpt-4o-mini'],
     'llm.openai.gpt2': ['gpt2-large', 'gpt2-medium'],
     'llm.google.gemma': ['gemma-2b', 'gemma-2b-it', 'gemma-7b-it', 'gemma-2-9b-it'],
     'llm.bigscience.bloomz': ['bloomz-560m', 'bloom-1b7'],
@@ -74,6 +77,9 @@ _MODULE2MODEL = {
     'llm.baichuan_inc.baichuan': ['Baichuan-7B'],
     'llm.ensemble.packllm': ['PackLLM'],
     'llm.learnware.xranker': ['xranker'],
+    'llm.huggingfacetb.sollm': ['SmolLM-1.7B'],
+    'llm.cohereforai.aya_expanse': ['aya-expanse-8b'],
+    'llm.facebook.mobilellm': ['MobileLLM-125M'],
     'llm.alibaba_nlp.gte_qwen2_it': ['gte-Qwen2-7B-instruct', 'gte-Qwen2-1.5B-instruct']
 }
 

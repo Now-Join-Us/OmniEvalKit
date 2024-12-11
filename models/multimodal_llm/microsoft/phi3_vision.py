@@ -22,6 +22,7 @@ class Phi3Vision(ModelWrapper):
         self.tokenizer = self.processor.tokenizer
 
     def preprocess_prompt_instruction(self, prompt_instruction, dataset_name, img_num):
+        img_num = 1
         prompt_instruction = replace_image_token(
             instruction=prompt_instruction,
             source_default_tokens=DATASET2DEFAULT_IMAGE_TOKEN.get(dataset_name, ['<image>']),
@@ -34,12 +35,12 @@ class Phi3Vision(ModelWrapper):
         img_num = len(data['image_path'])
         instruction = self.preprocess_prompt_instruction(data['prompt_instruction'], data['name'], img_num)
 
-        return (instruction, data['image_preloaded'][0])
+        return (instruction, data['image_preloaded'] if img_num <= 1 else [data['image_preloaded'][0]])
 
     def get_generated(self, instruction, image, **kwargs):
         prompt = self.processor.tokenizer.apply_chat_template(instruction, tokenize=False, add_generation_prompt=True)
 
-        inputs = self.processor(prompt, [image] if image is not None else None, return_tensors='pt').to(self.model.device)
+        inputs = self.processor(prompt, image if image is not None else None, return_tensors='pt').to(self.model.device)
 
         generation_args = {
             'max_new_tokens': 1000,

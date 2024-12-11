@@ -14,6 +14,13 @@ def remove_image_token(instruction, tokens):
             instruction = instruction.replace(src, '')
     return instruction
 
+def retain_only_first_sub_str(s, sub_s):
+    first_index = s.find(sub_s)
+
+    if first_index != -1:
+        s = s[:first_index + len(sub_s)] + s[first_index + len(sub_s):].replace(sub_s, '')
+    return s
+
 def replace_image_token(instruction, source_default_tokens, target_tokens, leaved_token_num=1):
     if isinstance(target_tokens, str):
         target_tokens = [target_tokens] * len(source_default_tokens)
@@ -21,6 +28,7 @@ def replace_image_token(instruction, source_default_tokens, target_tokens, leave
     for src in source_default_tokens:
         if src in instruction:
             instruction = instruction.replace(src, target_tokens[target_id])
+            instruction = retain_only_first_sub_str(instruction, target_tokens[target_id])
             target_id += 1
         if target_id >= leaved_token_num:
             break

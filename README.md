@@ -1,7 +1,11 @@
-<p align="left">
-    &nbspEnglish&nbsp | &nbsp; <a href="README_CN.md">中文</a>
-</p>
 <br>
+<br>
+<div align="center">
+
+<picture>
+  <img alt="OmniEvalKit logo" src="https://raw.githubusercontent.com/Now-Join-Us/OmniEvalKit/main/assets/images/logo.png" width="600px">
+</picture>
+</br>
 </br>
 
 </div>
@@ -16,14 +20,15 @@
 </p>
 
 <p align="center">
-    🚀 Ask questions or discuss ideas on <a href="https://github.com/AIDC-AI/M3Bench/discussions" target="_blank"> GitHub </a>
+    🚀 Ask questions or discuss ideas on <a href="https://github.com/AIDC-AI/M3Bench/discussions" target="_blank"> GitHub </a> · <a href="https://wx_id_is_cifar10.com" target="_blank"> WeChat </a>
 </p>
 
 <br>
 
-### Citation
+️🔥 Datasets download links and tutorials are being updated! Please stay tuned.
 
-+ If you find M<sup>3</sup>Bench useful, please cite ours.
+We retain various licenses at [AIDC](https://github.com/AIDC-AI). This repository is just a frequently updated version. If you find OmniEvalKit useful, please cite our work.
+
 
 ## License
 
