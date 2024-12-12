@@ -13,7 +13,7 @@
 <div id="top"></div>  
 
 <div align="center">
-  <h3 align="center">M<sup>3</sup>Bench: A Modular, Lightweight Toolbox for Evaluating LLM<br>and its Multilingual, Multidomain, Multimodal Extensions</h3>
+  <h3 align="center">OmniEvalKit: A Modular, Lightweight Toolbox for Evaluating Large Language Model and its Omni-Extensions</h3>
 </div>
 <p align="center">
 📝 <a href="https://arxiv.org/abs/2412.06693" target="_blank">Paper</a>
