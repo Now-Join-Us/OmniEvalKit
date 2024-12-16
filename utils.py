@@ -12,6 +12,7 @@ import torch
 from datetime import datetime
 from pathlib import Path
 from pprint import pprint
+from PIL import Image
 
 def get_max_length(model, tokenizer, _max_length=None):
     if _max_length:  # if max length manually set, return it
@@ -57,7 +58,7 @@ def simple_parse_args_string(args_string):
         return {}
     arg_list = [arg for arg in args_string.split(",") if arg]
     args_dict = {
-        k: handle_arg_string(v) for k, v in [arg.split(":") for arg in arg_list]
+        k: handle_arg_string(v) for k, v in [arg.split("=") for arg in arg_list]
     }
     return args_dict
 
@@ -122,39 +123,62 @@ def setup_args():
     parser.add_argument(
         "--time_str", "-t", type=str, default="", help="Timestamp e.g. `05_30_06_13_26`"
     )
+
+    parser.add_argument(
+        "--infer_type",
+        type=str,
+        default="direct",
+        choices=[
+            'direct',
+            'chain_of_thought',
+            'tree_of_thought',
+            'program_of_thought',
+            'self_consistency',
+            'tool_integrated_reasoning'
+        ],
+        help="Sets the inference method, various inferring (reasoning) techniques such as `direct`, `chain_of_thought`, `tree_of_thought`, `program_of_thought`, `self_consistency`, and `tool_integrated_reasoning`."
+    )
+    parser.add_argument(
+        "--infer_args",
+        type=str,
+        default="",
+        help="Comma separated string arguments for inferring, e.g. `device_map=auto`",
+    )
+
     parser.add_argument(
         "--model", "-m", type=str, default="Qwen/Qwen1.5-7B", help="Models e.g. `Qwen/Qwen1.5-7B`"
     )
     parser.add_argument(
         "--model_args",
         "-ma",
-        default="",
         type=str,
+        default="",
         help="Comma separated string arguments for model, e.g. `device_map=auto`",
     )
     parser.add_argument(
         "--tokenizer_args",
         "-ta",
-        default="",
         type=str,
+        default="",
         help="Comma separated string arguments for tokenizer, e.g. `use_fast=False`",
     )
+
     parser.add_argument(
         "--log_path",
         "-lp",
-        default=None,
         type=str,
+        default=None,
     )
     parser.add_argument(
         "--save_steps",
-        default=5000,
         type=int,
+        default=5000,
         help="How often to save intermediate results",
     )
     parser.add_argument(
         "--preloaded_image_num",
-        default=1,
         type=int,
+        default=1,
         help="The number of images pre-loaded in `__getitem__`.",
     )
     parser.add_argument(
@@ -201,6 +225,7 @@ def setup_args():
     check_argument_types(parser)
     args = parser.parse_args()
 
+    args.infer_args = simple_parse_args_string(args.infer_args)
     args.model_args = simple_parse_args_string(args.model_args)
     args.tokenizer_args = simple_parse_args_string(args.tokenizer_args)
     args.filter_model_args = simple_parse_args_string(args.filter_model_args)
@@ -296,7 +321,8 @@ def calculate_model_flops(model_wrapper, model_name):
 
     print(f"MODEL:{model_name}   FLOPs:{flops}   MACs:{macs}   Params:{params}")
 
-from PIL import Image
-
 def load_image(image_file_path):
     return Image.open(image_file_path).convert('RGB')
+
+def get_log_path(base_path, infer_type, model_name, dataset_name):
+    return os.path.join(base_path, model_name, dataset_name if infer_type == 'direct' else f'{dataset_name}_{infer_type}')

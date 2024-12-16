@@ -4,6 +4,7 @@ _DEFAULT_MAX_LENGTH = 2048
 
 MAX_GEN_TOKS = 1024
 
+
 MODEL_PATH = 'your_models_path/models'
 DATA_PATH = './data'
 OUTPUT_PATH = 'your_outputs_path/outputs'
@@ -80,7 +81,8 @@ _MODULE2MODEL = {
     'llm.huggingfacetb.sollm': ['SmolLM-1.7B'],
     'llm.cohereforai.aya_expanse': ['aya-expanse-8b'],
     'llm.facebook.mobilellm': ['MobileLLM-125M'],
-    'llm.alibaba_nlp.gte_qwen2_it': ['gte-Qwen2-7B-instruct', 'gte-Qwen2-1.5B-instruct']
+    'llm.alibaba_nlp.gte_qwen2_it': ['gte-Qwen2-7B-instruct', 'gte-Qwen2-1.5B-instruct'],
+    'llm.test_llm': ['TestLLM']
 }
 
 _MODULE2DATASET = {
@@ -165,6 +167,12 @@ TYPE2LANGUAGE2PROMPT = {
         'AR': 'من فضلك أجب بنعم أو لا.\n',
         'RU': 'Пожалуйста, ответьте Да или Нет.\n',
     },
+    'cot': {
+        'EN': 'Let\'s think step by step. ',
+        'ZH': '让我们一步一步来思考。',
+        'AR': 'دعنا نفكر خطوة بخطوة.',
+        'RU': 'Давайте думать шаг за шагом.'
+    }
 }
 
 FILTER_TYPE2LANGUAGE2PROMPT = {
