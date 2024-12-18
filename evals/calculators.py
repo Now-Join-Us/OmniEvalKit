@@ -2,6 +2,7 @@ import string
 import numpy as np
 from collections import defaultdict
 from itertools import chain
+from utils import flatten_list
 
 def one_hot_encode(item, length, topk=1):
     if isinstance(item, int):
@@ -51,7 +52,7 @@ class BaseCalculator:
         if isinstance(filtered_r, str):
             filtered_r = [filtered_r]
 
-        flattened_references = list(chain.from_iterable(gold))
+        flattened_references = flatten_list(gold)
         total_exact_match_score = sum(
             [
                 BaseCalculator.hf_exact_match.compute(predictions=filtered_r, references=[i_ref] * len(filtered_r), **kwargs)['exact_match'] \
