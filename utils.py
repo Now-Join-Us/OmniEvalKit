@@ -13,6 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from pprint import pprint
 from PIL import Image
+from collections.abc import Iterable
 
 def get_max_length(model, tokenizer, _max_length=None):
     if _max_length:  # if max length manually set, return it
@@ -326,3 +327,12 @@ def load_image(image_file_path):
 
 def get_log_path(base_path, infer_type, model_name, dataset_name):
     return os.path.join(base_path, model_name, dataset_name if infer_type == 'direct' else f'{dataset_name}_{infer_type}')
+
+def flatten_list(nested_list):
+    flattened = []
+    for item in nested_list:
+        if isinstance(item, str) or not isinstance(item, Iterable):
+            flattened.append(item)
+        else:
+            flattened.extend(flatten_list(item))
+    return flattened
