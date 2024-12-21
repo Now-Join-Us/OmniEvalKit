@@ -26,12 +26,12 @@ class InferCodeCenter(InferCenter):
         keys_to_extract = ["num_return_sequences", "do_sample", "temperature", "top_p", "top_k", "max_length"]
         gen_kwargs = {key: kwargs[key] for key in keys_to_extract if key in kwargs}
         # import pdb;pdb.set_trace()
-        code_gens = self.model_wrapper.generate_tokens(
+        token_gens = self.model_wrapper.generate_k_tokens(
             conversation=data['prompt_instruction'],
             # num_return_sequences = RETURN_K ,
             **gen_kwargs,
         ) ## List len==RETURN_K
-
+        # import pdb;pdb.set_trace()
         # INFILL_MODE = kwargs['INFILL_MODE']
         stop_words = self.stop_words
         # INSTRUCTION_MODE = kwargs['INSTRUCTION_MODE']
@@ -39,46 +39,46 @@ class InferCodeCenter(InferCenter):
 
         code_gens_result = []
         tokenizer = self.model_wrapper.tokenizer
-        for generated_tokens in code_gens:
-            for s in generated_tokens:
-                if INFILL_MODE or tokenizer.eos_token in stop_words:
-                    if s[0] == tokenizer.bos_token_id:
-                        s = s[1:]
-                    # Treat eos token as a regular stop word not removing it from the output
-                    # If it's removed it may have the effect of removing it in the middle of a
-                    # longer generation in case a batch size > 1 is used, which will result in
-                    # a wrong generation as it won't be used for splitting lateron
-                    gen_code = tokenizer.decode(
-                        s, skip_special_tokens=False, clean_up_tokenization_spaces=False
-                    )
-                    try:
-                        # some tokenizers add a multi-token prefix to the generation (e.g ChatGLM)
-                        tokenizer_prefix = tokenizer.decode(tokenizer.get_prefix_tokens())
-                        if gen_code.startswith(f"{tokenizer_prefix}"):
-                            gen_code = gen_code[len(tokenizer_prefix):].lstrip()
-                    except:
-                        pass
-                    if INFILL_MODE:
-                        gen_code = self._parse_infill(gen_code, tokenizer)
-                    if INSTRUCTION_MODE:
-                        # gen_code = _parse_instruction(gen_code, instruction_tokens)
-                        pass
-                else:
-                    gen_code = tokenizer.decode(
-                        s, skip_special_tokens=True, clean_up_tokenization_spaces=True
-                    )
-                if not INFILL_MODE:
-                    # gen_code = gen_code[len(prefix) :]
+        for generated_tokens in token_gens:
+            # for s in generated_tokens:
+            if INFILL_MODE or tokenizer.eos_token in stop_words:
+                if generated_tokens[0] == tokenizer.bos_token_id:
+                    generated_tokens = generated_tokens[1:]
+                # Treat eos token as a regular stop word not removing it from the output
+                # If it's removed it may have the effect of removing it in the middle of a
+                # longer generation in case a batch size > 1 is used, which will result in
+                # a wrong generation as it won't be used for splitting lateron
+                gen_code = tokenizer.decode(
+                    generated_tokens, skip_special_tokens=False, clean_up_tokenization_spaces=False
+                )
+                try:
+                    # some tokenizers add a multi-token prefix to the generation (e.g ChatGLM)
+                    tokenizer_prefix = tokenizer.decode(tokenizer.get_prefix_tokens())
+                    if gen_code.startswith(f"{tokenizer_prefix}"):
+                        gen_code = gen_code[len(tokenizer_prefix):].lstrip()
+                except:
                     pass
-                if postprocess:
-                    code_gens_result.append(
-                        self.postprocess_generation(gen_code, data['raw_prompt'])
-                    )
-                else:
-                    # warnings.warn(
-                    #     "model output is not postprocessed, this might lower evaluation scores"
-                    # )
-                    code_gens_result.append(gen_code)
+                if INFILL_MODE:
+                    gen_code = self._parse_infill(gen_code, tokenizer)
+                if INSTRUCTION_MODE:
+                    # gen_code = _parse_instruction(gen_code, instruction_tokens)
+                    pass
+            else:
+                gen_code = tokenizer.decode(
+                    generated_tokens, skip_special_tokens=True, clean_up_tokenization_spaces=True
+                )
+            if not INFILL_MODE:
+                # gen_code = gen_code[len(prefix) :]
+                pass
+            if postprocess:
+                code_gens_result.append(
+                    self.postprocess_generation(gen_code, data['raw_prompt'])
+                )
+            else:
+                # warnings.warn(
+                #     "model output is not postprocessed, this might lower evaluation scores"
+                # )
+                code_gens_result.append(gen_code)
         return code_gens_result
     def _parse_infill(code, tokenizer):
         """Reorder infill code and remove remaining special tokens."""
