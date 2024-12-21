@@ -135,7 +135,8 @@ def setup_args():
             'tree_of_thought',
             'program_of_thought',
             'self_consistency',
-            'tool_integrated_reasoning'
+            'tool_integrated_reasoning',
+            'coder'
         ],
         help="Sets the inference method, various inferring (reasoning) techniques such as `direct`, `chain_of_thought`, `tree_of_thought`, `program_of_thought`, `self_consistency`, and `tool_integrated_reasoning`."
     )
@@ -194,7 +195,7 @@ def setup_args():
     )
 
     parser.add_argument(
-        "--filter_type", "-et", type=str, default="regex", choices=['regex', 'model', 'regex,model'], help='filter type'
+        "--filter_type", "-et", type=str, default="regex", choices=['regex', 'model', 'regex,model', 'direct'], help='filter type'
     )
     parser.add_argument(
         "--filter_model", "-em", type=str, default=None, help="filter models e.g. `Qwen/Qwen1.5-7B`"

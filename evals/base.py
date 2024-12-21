@@ -46,6 +46,8 @@ class EvalTool(object):
         elif self.filter_type == 'regex,model':
             regex_filtered_results = self.regex_filter.apply(resps, self.dataset)
             return self.model_filter.apply(resps, self.dataset, regex_filtered_results)
+        elif self.filter_type == 'direct':
+            return resps
         else:
             raise NotImplementedError
 
