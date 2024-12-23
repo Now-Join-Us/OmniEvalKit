@@ -56,8 +56,7 @@ if __name__ == "__main__":
 
             infer_module = importlib.import_module(f'infer.{args.infer_type}')
             center = getattr(infer_module, 'infer_core')(model_wrapper, **args.infer_args)
-            resp = center.infer(data=data)
-
+            resp = center.infer(data=data, **args.infer_args)
             if isinstance(data, list):
                 resps.update({i_data['id']: resp[i_data['id']] for i_data in data})
             else:

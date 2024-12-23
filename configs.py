@@ -45,6 +45,7 @@ _MODULE2MODEL = {
     'llm.qwen.qwen_base': ['Qwen-1_8B', 'Qwen-7B'],
     'llm.qwen.qwen_chat': ['Qwen-1_8B-Chat', 'Qwen-7B-Chat'],
     'llm.qwen.qwen2_5_chat': ['Qwen2.5-7B-Instruct'],
+    'llm.qwen.qwen_coder2': ['Qwen2.5-Coder-1.5B-Instruct'],
     'llm.01_ai.yi_chat': ['Yi-1.5-6B-Chat', 'Yi-1.5-9B-Chat', 'Yi-6B-Chat'],
     'llm.deepseek_ai.deepseek_llm': ['deepseek-llm-7b-chat'],
     'llm.internlm.internlm_chat': ['internlm2-chat-7b', 'internlm-chat-7b'],
