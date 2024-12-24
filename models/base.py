@@ -160,6 +160,11 @@ class ModelWrapper(object):
             return self.model
         return None
 
+    def get_tokenizer(self):
+        if hasattr(self, 'tokenizer'):
+            return self.tokenizer
+        return None
+
     @abstractmethod
     def generate_text_only_from_token_id(self, conversation, **kwargs):
         raise NotImplementedError

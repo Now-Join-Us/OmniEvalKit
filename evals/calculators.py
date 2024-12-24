@@ -2,7 +2,7 @@ import string
 import numpy as np
 from collections import defaultdict
 from itertools import chain
-from utils import flatten_list
+from utils import flatten_list, logger
 
 def one_hot_encode(item, length, topk=1):
     if isinstance(item, int):
@@ -39,11 +39,8 @@ def _align_two_type(a, b):
         return a, string.ascii_uppercase[b]
 
 class BaseCalculator:
-    try:
-        import evaluate as hf_evaluate
-        hf_exact_match = hf_evaluate.load("exact_match")
-    except:
-        hf_exact_match = None
+    import evaluate as hf_evaluate
+    hf_exact_match = hf_evaluate.load("evals/metrics/exact_match.py")
 
     @staticmethod
     def exact_match(filtered_r, gold, max_to_0_1=False, **kwargs):
@@ -63,6 +60,10 @@ class BaseCalculator:
             return {'acc': 1.0} if total_exact_match_score > 0 else {'acc': 0.0}
 
         return {'acc': total_exact_match_score}
+
+    @staticmethod
+    def exact_in(filtered_r, gold, **kwargs):
+        return {'acc': 1.0 if gold in filtered_r else 0.0}
 
     @staticmethod
     def multiple_choice(filtered_r, is_filtered, gold, **kwargs):

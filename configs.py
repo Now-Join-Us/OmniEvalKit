@@ -1,13 +1,15 @@
 # Copyright (C) 2024 AIDC-AI
+
+MODEL_PATH = 'your_models_path/models'
+DATA_PATH = './data'
+OUTPUT_PATH = 'your_outputs_path/outputs'
+
+
 import os
 _DEFAULT_MAX_LENGTH = 2048
 
 MAX_GEN_TOKS = 1024
 
-
-MODEL_PATH = 'your_models_path/models'
-DATA_PATH = './data'
-OUTPUT_PATH = 'your_outputs_path/outputs'
 
 datasets = \
     ['hellaswag', 'mmlu', 'arc_challenge', 'arc_easy', 'winogrande', 'truthfulqa_mc1', 'truthfulqa_mc2', 'aclue', 'anli', 'boolq', 'cb', 'cmmlu', 'cola', 'crows_pairs', 'copa', 'glue', 'lambada', 'mathqa', 'mnli', 'mrpc', 'openbookqa', 'piqa'] + \
@@ -52,6 +54,7 @@ _MODULE2MODEL = {
     'llm.thudm.glm': ['glm-10b'],
     'llm.thudm.glm_4_chat': ['glm-4-9b-chat'],
     'llm.thudm.chatglm': ['chatglm-6b', 'chatglm2-6b', 'chatglm3-6b'],
+    'llm.microsoft.phi3_5': ['Phi-3.5-mini-instruct'],
     'llm.microsoft.phi_instruct': ['Phi-3-mini-4k-instruct', 'Phi-3-mini-128k-instruct', 'Phi-3-small-8k-instruct', 'Phi-3-small-128k-instruct'],
     'llm.microsoft.ocra2': ['Orca-2-7b'],
     'llm.microsoft.phi2': ['phi-2'],

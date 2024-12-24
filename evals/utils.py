@@ -51,11 +51,11 @@ def place_begin_image_token(instruction, source_default_tokens, target_tokens, l
 
 def choices_raw_match(resp, choices):
     if len(choices) == 0 or len(resp) == 0:
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
     for i_option, i_choice in zip(string.ascii_uppercase[:len(choices)], choices):
         if resp.lower() in i_choice.lower():
-            return {'value': [i_option], 'is_filtered': True}
-    return {'value': resp, 'is_filtered': False}
+            return {'filtered_response': [i_option], 'is_filtered': True}
+    return {'filtered_response': resp, 'is_filtered': False}
 
 def choices_fuzzy_match(resp, choices, gold):
     matched_choices = []
@@ -73,13 +73,16 @@ def choices_fuzzy_match(resp, choices, gold):
             similarities.append(similarity)
 
     if len(matched_choices) == len(choices) and any([i > 0.95 for i in similarities]) and gold_length != len(choices):
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
 
     if matched_choices:
         combined = list(zip(matched_choices, similarities))
         sorted_combined = sorted(combined, key=lambda x: x[1], reverse=True)
         sorted_matched_choices, sorted_similarities = zip(*sorted_combined)
         sorted_matched_choices = list(sorted_matched_choices)
-        return {'value': list(dict.fromkeys(sorted_matched_choices)), 'is_filtered': True}
+        return {'filtered_response': list(dict.fromkeys(sorted_matched_choices)), 'is_filtered': True}
     else:
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
+
+def opt_or_base_type(opt_type, base_type):
+    return opt_type if opt_type is not None else base_type

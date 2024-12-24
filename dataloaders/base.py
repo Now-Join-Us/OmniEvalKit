@@ -6,6 +6,7 @@ from configs import TYPE2LANGUAGE2PROMPT
 from evals.calculators import BaseCalculator
 from evals.estimators import BaseEstimator
 from evals.metrics import EXTRACTMATCH
+from evals.utils import opt_or_base_type
 
 class Dataset(object):
     """
@@ -61,30 +62,39 @@ class Dataset(object):
             sample['prompt_instruction'] = f"{translate_prompt('Hint: ', language)}{sample['hint']}\n" + sample['prompt_instruction']
         return sample
 
-    def caculate(self, data, base_dict, base_calculate_kwargs):
-        if data['question_type'] == 'multiple_choice':
-            if data['request_type'] == 'loglikelihood':
-                metric2score, filtered_base_dict = self.calculator.loglikelihood(
+    def calculate(self, data, filtered_response, is_filtered, question_type, request_type, calculate_type):
+        question_type = opt_or_base_type(question_type, data.get('question_type', 'open'))
+        request_type = opt_or_base_type(request_type, data.get('request_type', 'open'))
+        base_calculate_kwargs = {
+            'filtered_r': filtered_response,
+            'is_filtered': is_filtered,
+            'gold': data['gold']
+        }
+        if question_type == 'multiple_choice':
+            if request_type == 'loglikelihood':
+                metric2score, filtered_base_dict = getattr(self.calculator, opt_or_base_type(calculate_type, 'loglikelihood'))(
                     **base_calculate_kwargs,
                     choices_length=[len(i) for i in data.get('choices', data.get('prompt_choices', None))],
                     prompt_choices=data['prompt_choices']
                 )
-                base_dict.update(filtered_base_dict)
             else:
-                metric2score = self.calculator.multiple_choice(**base_calculate_kwargs)
+                metric2score = getattr(self.calculator, opt_or_base_type(calculate_type, 'multiple_choice'))(**base_calculate_kwargs)
 
-        elif data['question_type'] == 'open':
-            metric2score = self.calculator.exact_match(
+        elif question_type == 'open':
+            gold = base_calculate_kwargs['gold']
+            if isinstance(gold, int) and 'prompt_choices' in data.keys():
+                gold = data['prompt_choices'][gold]
+            metric2score = getattr(self.calculator, opt_or_base_type(calculate_type, 'exact_match'))(
                 filtered_r=base_calculate_kwargs['filtered_r'],
-                gold=base_calculate_kwargs['gold'],
+                gold=gold,
                 max_to_0_1=True,
                 **EXTRACTMATCH.get(data['name'], {})
             )
 
-        elif data['question_type'] == 'yes_or_no':
-            metric2score = self.calculator.multiple_choice(**base_calculate_kwargs)
+        elif question_type == 'yes_or_no':
+            metric2score = getattr(self.calculator, opt_or_base_type(calculate_type, 'multiple_choice'))(**base_calculate_kwargs)
         else:
-            raise NotImplementedError(f'Unknown question_type: {data["question_type"]}')
+            raise NotImplementedError(f'Unknown question_type: {question_type}')
 
         return metric2score
 

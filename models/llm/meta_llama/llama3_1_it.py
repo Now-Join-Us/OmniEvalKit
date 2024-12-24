@@ -20,7 +20,8 @@ class LLaMA3_1Base(ModelWrapper):
 
         outputs = self.pipeline(
             messages,
-            max_new_tokens=128,
+            max_new_tokens=512,
+            pad_token_id=self.tokenizer.eos_token_id
         )
         response = outputs[0]["generated_text"][-1]
 

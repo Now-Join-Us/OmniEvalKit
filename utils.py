@@ -13,7 +13,19 @@ from datetime import datetime
 from pathlib import Path
 from pprint import pprint
 from PIL import Image
+from collections import Counter
 from collections.abc import Iterable
+
+
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(name)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+
+logger = logging.getLogger(__name__)
 
 def get_max_length(model, tokenizer, _max_length=None):
     if _max_length:  # if max length manually set, return it
@@ -195,28 +207,33 @@ def setup_args():
     )
 
     parser.add_argument(
-        "--filter_type", "-et", type=str, default="regex", choices=['regex', 'model', 'regex,model', 'direct'], help='filter type'
+        "--data_url", type=str, default=None
+    )
+    parser.add_argument('--only_do_eval', action='store_true')
+    parser.add_argument(
+        "--filter_type", type=str, default="regex", choices=['regex', 'model_based', 'regex,model_based', 'extract_tail']
     )
     parser.add_argument(
-        "--filter_model", "-em", type=str, default=None, help="filter models e.g. `Qwen/Qwen1.5-7B`"
+        "--filter_args", type=str, default=""
     )
     parser.add_argument(
-        "--data_url", "-du", type=str, default=None
+        "--filter_model", type=str, default=None, help="filter models e.g. `Qwen/Qwen1.5-7B`"
     )
     parser.add_argument(
         "--filter_model_args",
-        "-ema",
         default="",
         type=str,
         help="Comma separated string arguments for filter model, e.g. `device_map=auto`",
     )
     parser.add_argument(
         "--filter_tokenizer_args",
-        "-eta",
         default="",
         type=str,
         help="Comma separated string arguments for filter model tokenizer, e.g. `use_fast=False`",
     )
+    parser.add_argument(
+        "--eval_args", type=str, default=""
+    ) # question_type=xxx,request_type=xxx,calculate_type=xxx,estimate_type=each_then_overall (or overall)
     parser.add_argument(
         "--batch_size",
         default=1,
@@ -227,11 +244,19 @@ def setup_args():
     check_argument_types(parser)
     args = parser.parse_args()
 
-    args.infer_args = simple_parse_args_string(args.infer_args)
-    args.model_args = simple_parse_args_string(args.model_args)
-    args.tokenizer_args = simple_parse_args_string(args.tokenizer_args)
-    args.filter_model_args = simple_parse_args_string(args.filter_model_args)
-    args.filter_tokenizer_args = simple_parse_args_string(args.filter_tokenizer_args)
+    args_to_parse = [
+        'infer_args',
+        'model_args',
+        'tokenizer_args',
+        'filter_args',
+        'filter_model_args',
+        'filter_tokenizer_args',
+        'eval_args'
+    ]
+
+    for arg_to_parse_name in args_to_parse:
+        setattr(args, arg_to_parse_name, simple_parse_args_string(getattr(args, arg_to_parse_name)))
+
     if args.time_str == '':
         args.time_str = datetime.now().strftime('%m_%d_%H_%M_%S')
 
@@ -337,3 +362,11 @@ def flatten_list(nested_list):
         else:
             flattened.extend(flatten_list(item))
     return flattened
+
+def most_common_length_strings(strings):
+    ## 计算出现频率最高的字符串长度，并返回该长度的第一个字符串 ##
+    lengths = [len(s) for s in strings]
+    length_count = Counter(lengths)
+    most_common_length = length_count.most_common(1)[0][0]
+    result = [s for s in strings if len(s) == most_common_length]
+    return result[0]

@@ -4,7 +4,7 @@ class COCODataset(Dataset):
     def __init__(self, dataset_name=None, dataset_file_path=None, rank=None, world_size=None, image_url=None, preloaded_image_num=1):
         super().__init__(dataset_name=dataset_name, dataset_file_path=dataset_file_path, rank=rank, world_size=world_size, image_url=image_url, preloaded_image_num=preloaded_image_num)
 
-    def caculate(self, data, base_dict, base_calculate_kwargs):
+    def calculate(self, data, base_dict, base_calculate_kwargs):
 
         from pycocoevalcap.bleu.bleu import Bleu
         from pycocoevalcap.rouge.rouge import Rouge

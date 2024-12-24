@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from abc import ABC, abstractmethod
 
 from models.base import tok_encode, tok_decode, tok_batch_encode, _model_generate
-from dataloaders.utils import detect_language
+from dataloaders.prompts import cot_prompt, pot_prompt
 
 from utils import get_max_length
 from configs import MAX_GEN_TOKS, GEN_DATASET2UNTIL, GEN_DO_SAMPLE, GEN_TEMPERATURE, TYPE2LANGUAGE2PROMPT
@@ -218,30 +218,33 @@ class InferCenter(object):
         else:
             return self.generate_text_only(self.model_wrapper, data, device) # LLM on multimodal data
 
-    def infer_direct(self, data, device=torch.device('cuda')):
+    def infer_direct(self, data, device=torch.device('cuda'), force_use_generate=False):
         is_multimodal = 'image_path' in data.keys()
 
         if self.model_wrapper.force_use_generate or isinstance(data, list):
             return self.generate_by_self('vqa' if is_multimodal else 'text_only', data, device)
 
-        if data['request_type'] == 'loglikelihood':
-            if is_multimodal:
-                return self.loglikelihood_vqa(data, device)
-            return self.loglikelihood_text_only(data, device)
-        elif data['request_type'] == 'generate_until':
+        if force_use_generate or data['request_type'] == 'generate_until':
             if is_multimodal:
                 return self.generate_vqa(data, device) # MLLM or LLM on multimodal data
             else: # LLM or MLLM on text-only data
                 if self.model_wrapper.is_overridden_generate_text_only(self.model_wrapper):
                     return self.generate_by_self('text_only', data, device)
                 return self.generate_text_only(data, device)
+        elif data['request_type'] == 'loglikelihood':
+            if is_multimodal:
+                return self.loglikelihood_vqa(data, device)
+            return self.loglikelihood_text_only(data, device)
         else:
-            raise NotImplementedError(f"Unsupported type: {data['question_type']}")
+            raise NotImplementedError(f"Unsupported type: {request_type}")
 
     def infer_chain_of_thought(self, data, device=torch.device('cuda')):
-        language = detect_language(data['prompt_instruction'])
-        data['prompt_instruction'] = data['prompt_instruction'].rstrip() + ' ' + TYPE2LANGUAGE2PROMPT['cot'][language]
-        return self.infer_direct(data, device)
+        data['prompt_instruction'] = cot_prompt(data['prompt_instruction'])
+        return self.infer_direct(data, device, force_use_generate=True)
+
+    def infer_program_of_thought(self, data, device=torch.device('cuda')):
+        data['prompt_instruction'] = pot_prompt(data['prompt_instruction'], data['name'])
+        return self.infer_direct(data, device, force_use_generate=True)
 
     @abstractmethod
     def infer(self, data, device=torch.device('cuda'), **kwargs):

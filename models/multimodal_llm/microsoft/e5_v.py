@@ -19,9 +19,7 @@ class E5_V(ModelWrapper):
         super().__init__()
         self.llama3_template = '<|start_header_id|>user<|end_header_id|>\n\n{}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n \n'
         self.processor = LlavaNextProcessor.from_pretrained(model_path)
-        print('Load Model')
         self.model = LlavaNextForConditionalGeneration.from_pretrained(model_path, **{k: v for k, v in model_args.items() if k != 'documents_file'}).to(torch.device('cuda'))
-        print(self.model.device)
 
         if 'documents_file' in model_args.keys():
             with open(os.path.join(DATA_PATH, model_args['documents_file']), 'r', encoding='utf-8') as f:

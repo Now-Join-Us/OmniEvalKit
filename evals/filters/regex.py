@@ -1,48 +1,11 @@
 import re
 import string
 
-
-from abc import ABC, abstractmethod
-from typing import Iterable, List, Union
-
-from collections import Counter
-
+from utils import most_common_length_strings
 from evals.utils import choices_fuzzy_match
-from configs import FILTER_TYPE2LANGUAGE2PROMPT
-from dataloaders.utils import detect_language, translate_prompt
 
-def most_common_length_strings(strings):
-    lengths = [len(s) for s in strings]
-    length_count = Counter(lengths)
-    most_common_length = length_count.most_common(1)[0][0]
-    result = [s for s in strings if len(s) == most_common_length]
-    return result[0]
 
-class Filter(ABC):
-    """
-    Filter classes operate on a per-task level.
-    They take all model outputs (`instance.resps` for all `task.instances`)
-    across all instances of a task, and perform operations.
-    In a single run, one can configure any number of separate filters or lists of filters.
-
-    """
-
-    def __init__(self, **kwargs) -> None:
-        """
-        Can define custom behavior here, if an individual instantiation of a Filter class should have state.
-        """
-
-    @abstractmethod
-    def apply(self, resps: Union[List, Iterable], docs: List[dict]) -> Iterable:
-        """
-        Defines the operation to perform on a list of the `inst.resps` properties of `Instance` objects.
-        Should return the list of (filtered) response lists *in the same order as they were input*, e.g.
-        if pass in [<inst.resps for instance 0>, <inst.resps for instance 1>] should return
-        [<filtered resps for instance 0>, <filtered resps for instance 1>]
-        """
-        return resps
-
-class RegexFilter(Filter):
+class RegexFilter(object):
     def __init__(
         self,
         dataset_name,
@@ -368,11 +331,11 @@ class RegexFilter(Filter):
 
         if len(matched_choices) > 0:
             return {
-                'value': list(dict.fromkeys(matched_choices)),
+                'filtered_response': list(dict.fromkeys(matched_choices)),
                 'is_filtered': True
             }
 
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
 
     def binary_preprocess(self, resp):
         patterns = self.get_binary_patterns()
@@ -396,9 +359,9 @@ class RegexFilter(Filter):
         no_first_index, no_pattern_matched = get_first_appear_index(patterns['no'], resp[begin_index:])
 
         if yes_pattern_matched is None and no_pattern_matched is None:
-            return {'value': resp, 'is_filtered': False}
+            return {'filtered_response': resp, 'is_filtered': False}
 
-        return {'value': 'Yes', 'is_filtered': True} if yes_first_index <= no_first_index else {'value': 'No', 'is_filtered': True}
+        return {'filtered_response': 'Yes', 'is_filtered': True} if yes_first_index <= no_first_index else {'filtered_response': 'No', 'is_filtered': True}
 
     def open_preprocess(self, resp):
         patterns = self.get_open_patterns()
@@ -406,9 +369,9 @@ class RegexFilter(Filter):
         if self.dataset_name == 'eq_bench':
             find_resps = re.findall(patterns[0], resp)
             if find_resps:
-                return {'value': find_resps, 'is_filtered': True}
+                return {'filtered_response': find_resps, 'is_filtered': True}
             else:
-                return {'value': resp, 'is_filtered': False}
+                return {'filtered_response': resp, 'is_filtered': False}
         else:
             for pattern in patterns:
                 matched = re.search(pattern, resp, re.DOTALL)
@@ -421,116 +384,39 @@ class RegexFilter(Filter):
                 matched_open_results = [i for i in matched_open_results if i is not None]
 
                 return {
-                    'value': most_common_length_strings(matched_open_results),
+                    'filtered_response': most_common_length_strings(matched_open_results),
                     'is_filtered': True
                 }
-            return {'value': resp, 'is_filtered': False}
+            return {'filtered_response': resp, 'is_filtered': False}
 
-    def apply(self, resps, docs):
-        # here, we assume we have a list, in which each element is
-        # a list of model responses for some particular input/target pair.
-        # so we process each of these (same input/target response sets)
-        # independently (and keep them a list.)
-        filtered = []
-        for r, d in zip(resps, docs):
-            if isinstance(r, dict):
-                if 'content' in r.keys():
-                    r = r['content']
 
-            if isinstance(r, list):
-                matched = {'value': r, 'is_filtered': True}
-            elif isinstance(r, str):
-                if d['question_type'] == 'multiple_choice':
-                    matched = self.choices_preprocess(r, d['choices'])
-                    if not matched['is_filtered']:
-                        matched = self.choices_preprocess(self.open_preprocess(r)['value'], d['choices'])
-                    if not matched['is_filtered']:
-                        matched = choices_fuzzy_match(r, d['prompt_choices'] if 'prompt_choices' in d.keys() else d['choices'], d['gold'])
-                    if not matched['is_filtered'] and 'prompt_choices' in d.keys() and 'choices' in d.keys():
-                        matched = choices_fuzzy_match(r, d['choices'], d['gold'])
-                    # matched = self.vlme_can_infer_option(r, d['choices'])
-                    # if not matched['is_filtered']:
-                    #     matched = self.vlme_can_infer_text(r, d['choices'])
-                elif d['question_type'] == 'open':
-                    matched = self.open_preprocess(r)
-                elif d['question_type'] == 'yes_or_no':
-                    matched = self.binary_preprocess(r)
-                    # matched = self.vlme_yes_or_no(r)
-                else:
-                    raise NotImplementedError(f'Unhandled question type: {d["question_type"]}')
+    def apply(self, response, data, question_type):
+        ## 优先级：question_type > data['question_type']
+        entry_question_type = question_type if question_type is not None else data.get('question_type', 'open')
+        if isinstance(response, dict):
+            if 'content' in response.keys():
+                response = response['content']
+
+        if isinstance(response, list):
+            matched = {'filtered_response': response, 'is_filtered': True}
+        elif isinstance(response, str):
+            if entry_question_type == 'multiple_choice':
+                matched = self.choices_preprocess(response, data['choices'])
+                if not matched['is_filtered']:
+                    matched = self.choices_preprocess(self.open_preprocess(response)['filtered_response'], data['choices'])
+                if not matched['is_filtered']:
+                    matched = choices_fuzzy_match(response, data['prompt_choices'] if 'prompt_choices' in data.keys() else data['choices'], data['gold'])
+                if not matched['is_filtered'] and 'prompt_choices' in data.keys() and 'choices' in data.keys():
+                    matched = choices_fuzzy_match(response, data['choices'], data['gold'])
+            elif entry_question_type == 'open':
+                matched = self.open_preprocess(response)
+            elif entry_question_type == 'yes_or_no':
+                matched = self.binary_preprocess(response)
             else:
-                raise NotImplementedError(f'Unhandled response type: {type(r)}')
-            filtered.append(matched)
-        return filtered
+                raise NotImplementedError(f'Unhandled question type: {question_type}')
+        else:
+            raise NotImplementedError(f'Unhandled response type: {type(response)}')
 
-class ModelFilter(RegexFilter):
-    def __init__(
-        self,
-        model,
-        custom_patterns=[],
-    ) -> None:
-        """
-        pass a string `regex` to run `re.compile(r"regex")` on.
-        """
-        super().__init__()
-        self.model = model
+        return matched
 
-        def _get_prompt(q_type):
-            def core(language, question, resp):
-                prompt = FILTER_TYPE2LANGUAGE2PROMPT[q_type][language]
-                prompt += translate_prompt('Question: ', language) + question + '\n' + \
-                    translate_prompt('Answer: ', language) + resp + '\n' + \
-                    translate_prompt('Output: ', language) + '\n'
-
-                return prompt
-            return core
-        self.get_prompt = {
-            q_type: _get_prompt(q_type) for q_type in ['multiple_choice', 'open', 'yes_or_no']
-        }
-
-    def preprocess(self, resp, q_type, prompt_instruction, choices=None):
-        language = detect_language(resp)
-        filter_prompt = self.get_prompt[q_type](
-            language=language,
-            question=prompt_instruction,
-            resp=resp
-        )
-        filtered = self.model.generate_text_only(filter_prompt)
-        if q_type == 'yes_or_no':
-            if 'yes' in filtered.lower():
-                return {'value': 'Yes', 'is_filtered': True}
-            elif 'no' in filtered.lower():
-                return {'value': 'No', 'is_filtered': True}
-            return {'value': resp, 'is_filtered': False}
-
-        elif q_type == 'multiple_choice':
-            return super().choices_preprocess(
-                resp=filtered,
-                choices=choices
-            )
-
-        return {'value': filtered, 'is_filtered': True}
-
-    def apply(self, resps, docs, filtered_results=None):
-        filtered_results = [{'value': '', 'is_filtered': False} for _ in range(len(resps))] if filtered_results is None else filtered_results
-
-        filtered = []
-        for r, d, fr in zip(resps, docs, filtered_results):
-            if fr['is_filtered']:
-                filtered.append(fr)
-                continue
-
-            if isinstance(r, list):
-                matched = {'value': r, 'is_filtered': True}
-            elif isinstance(r, str):
-                matched = self.preprocess(
-                    resp=r,
-                    q_type=d['question_type'],
-                    prompt_instruction=d['raw_instruction'],
-                    choices=d['choices'] if 'choices' in d.keys() else None
-                )
-            else:
-                raise NotImplementedError
-            filtered.append(matched)
-
-        return filtered
+filter_core = RegexFilter
