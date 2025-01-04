@@ -1,4 +1,4 @@
-from dataloaders.base import Dataset
+from dataloaders.general import Dataset
 import numpy as np
 
 class MMCCDataset(Dataset):

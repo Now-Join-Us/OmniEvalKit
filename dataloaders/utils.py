@@ -1,6 +1,4 @@
 import re
-from configs import DATASET2MODULE
-import importlib
 
 def detect_language(text):
     arabic_re = re.compile(r'[\u0600-\u06FF]')
@@ -41,14 +39,3 @@ def translate_prompt(text, target_language):
         }
     }
     return trans[text][target_language]
-
-def get_data(dataset_name, **kwargs):
-    if dataset_name in DATASET2MODULE.keys():
-        module = importlib.import_module(f'dataloaders.{DATASET2MODULE[dataset_name]}') # means `from dataloaders.bbh`
-        data_core = getattr(module, 'data_core') # means `from dataloaders.bbh import data_core`
-        dataset = data_core(dataset_name=dataset_name, **kwargs)
-    else:
-        from dataloaders.base import Dataset
-        dataset = Dataset(dataset_name=dataset_name, **kwargs)
-
-    return dataset

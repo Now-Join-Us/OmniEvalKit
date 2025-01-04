@@ -11,9 +11,9 @@ class GLM(ModelWrapper):
 
     def generate_text_only(self, conversation, **kwargs):
         inputs = self.tokenizer(conversation + ' [MASK]', return_tensors="pt")
-        inputs = self.tokenizer.build_inputs_for_generation(inputs, max_gen_length=512)
+        inputs = self.tokenizer.build_inputs_for_generation(inputs)
         inputs = inputs.to(self.model.device)
-        outputs = self.model.generate(**inputs, max_length=1024, eos_token_id=self.tokenizer.eop_token_id)
+        outputs = self.model.generate(**inputs, max_new_tokens=512, eos_token_id=self.tokenizer.eop_token_id)
         return self.tokenizer.decode(outputs[0].tolist())
 
 model_core = GLM

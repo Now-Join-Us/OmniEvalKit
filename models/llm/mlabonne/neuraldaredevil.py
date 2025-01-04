@@ -15,7 +15,7 @@ class Neuraldaredevil(ModelWrapper):
 
         prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
-        outputs = pipeline(prompt, max_new_tokens=256, do_sample=True, temperature=0.7, top_k=50, top_p=0.95)
+        outputs = pipeline(prompt, max_new_tokens=512, do_sample=True, temperature=0.7, top_k=50, top_p=0.95)
         return outputs[0]["generated_text"]
 
 model_core = Neuraldaredevil

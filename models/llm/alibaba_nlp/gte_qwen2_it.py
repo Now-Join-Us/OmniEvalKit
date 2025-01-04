@@ -10,7 +10,7 @@ class GTEQwen2(ModelWrapper):
     def __init__(self, model_path, model_args, tokenizer_args):
         super().__init__()
         self.model = SentenceTransformer(model_path, **{k: v for k, v in model_args.items() if k != 'documents_file'})
-        self.model.max_seq_length = 8192
+        self.model.max_seq_length = 512
         with open(os.path.join(DATA_PATH, model_args['documents_file']), 'r', encoding='utf-8') as f:
             themes = [i.strip() for i in f.readlines()]
         self.themes_embeddings = self.model.encode(themes)

@@ -6,7 +6,7 @@ class InternLMChat(ModelWrapper):
         super().__init__(model_path=model_path, model_args=model_args, tokenizer_args=tokenizer_args)
 
     def generate_text_only(self, conversation, **kwargs):
-        response = self.generate_with_chat(self.tokenizer, conversation)
+        response = self.generate_with_chat(self.tokenizer, conversation, max_new_tokens=512)
         return response
 
 model_core = InternLMChat

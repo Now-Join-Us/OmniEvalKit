@@ -164,3 +164,4 @@ cython_debug/
 # data
 data/
 your_outputs_path/
+scripts/

@@ -1,7 +1,7 @@
 # This file includes functions adapted from the VLMEvalKit repository (https://github.com/open-compass/VLMEvalKit).
 # Original work by Duan et al., licensed under Apache-2.0 license.
 # Copyright 2023 VLMEvalKit Authors. All rights reserved.
-from dataloaders.base import Dataset
+from dataloaders.general import Dataset
 
 class OCRDataset(Dataset):
     def __init__(self, dataset_name=None, dataset_file_path=None, rank=None, world_size=None, image_url=None, preloaded_image_num=1):

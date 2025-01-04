@@ -20,8 +20,30 @@ class BaseEstimator:
         return shrunk_results
 
     @staticmethod
-    def sum_or_avg(scores, categories, sub_categories, considered_categories=None, e_type='sum'):
-        category2metric2static = {}
+    def avg_k(scores, **kwargs):
+        sum_dict = defaultdict(float)
+        count_dict = defaultdict(int)
+        
+        for item in scores:
+            pass_at_k = item.get('pass_at_k', {})
+            for k, acc in pass_at_k.items():
+                sum_dict[k] += acc
+                count_dict[k] += 1
+        
+        # 计算每个k的平均值
+        avg_pass_at_k = {}
+        for k in sum_dict:
+            avg_pass_at_k[k] = sum_dict[k] / count_dict[k]
+        
+        # 构建结果字典，格式与每一项相同
+        result = {"pass_at_k": avg_pass_at_k}
+        return result
+    
+    @staticmethod
+    def sum_or_avg(scores, categories, sub_categories, considered_categories=None, e_type='sum', **kwargs):
+        import pdb; pdb.set_trace()
+        # scores : 列表，每一项是calculate返回的字典
+        category2metric2static = {} 
         def _s_or_a(inputs):
             assert len(inputs) != 0
             metric2static = {}

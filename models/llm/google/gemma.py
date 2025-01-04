@@ -12,7 +12,7 @@ class Gemma(ModelWrapper):
     def generate_text_only(self, conversation, **kwargs):
         input_ids = self.tokenizer(conversation, return_tensors="pt").to(self.model.device)
 
-        outputs = self.model.generate(**input_ids)
+        outputs = self.model.generate(**input_ids, max_new_tokens=512)
         return self.tokenizer.decode(outputs[0])
 
 model_core = Gemma

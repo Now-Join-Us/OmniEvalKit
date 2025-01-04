@@ -1,5 +1,7 @@
 from models.base import ModelWrapper
 
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 class QwenChat(ModelWrapper):
     def __init__(self, model_path, model_args, tokenizer_args):
         super().__init__(model_path=model_path, model_args=model_args, tokenizer_args=tokenizer_args)
@@ -20,7 +22,7 @@ class QwenChat(ModelWrapper):
 
         generated_ids = self.model.generate(
             model_inputs.input_ids,
-            max_new_tokens=10
+            max_new_tokens=512
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)

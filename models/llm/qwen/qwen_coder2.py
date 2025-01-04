@@ -11,12 +11,11 @@ class QwenCoder2(ModelWrapper):
         return response
 
     def generate_k_tokens(self, conversation, **gen_kwargs):
-        # import pdb; pdb.set_trace()
         inputs = self.tokenizer(conversation, return_tensors='pt').to(self.model.device)
         generated_tokens = self.model.generate(
-                            **inputs,
-                            # num_return_sequences=gen_kwargs.get('num_return_sequences', 1),
-                            **gen_kwargs,
-                        )
+            **inputs,
+            # num_return_sequences=gen_kwargs.get('num_return_sequences', 1),
+            **gen_kwargs
+        )
         return generated_tokens 
 model_core = QwenCoder2

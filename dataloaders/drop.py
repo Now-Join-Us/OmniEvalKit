@@ -12,7 +12,7 @@ Homepage: https://allenai.org/data/drop
 Acknowledgement: This implementation is based on the official evaluation for `DROP`:
 https://github.com/allenai/allennlp-reading-comprehension/blob/master/allennlp_rc/eval/drop_eval.py
 """
-from dataloaders.base import Dataset
+from dataloaders.general import Dataset
 import re
 import string
 

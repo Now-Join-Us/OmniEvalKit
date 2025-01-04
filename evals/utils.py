@@ -51,11 +51,11 @@ def place_begin_image_token(instruction, source_default_tokens, target_tokens, l
 
 def choices_raw_match(resp, choices):
     if len(choices) == 0 or len(resp) == 0:
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
     for i_option, i_choice in zip(string.ascii_uppercase[:len(choices)], choices):
         if resp.lower() in i_choice.lower():
-            return {'value': [i_option], 'is_filtered': True}
-    return {'value': resp, 'is_filtered': False}
+            return {'filtered_response': [i_option], 'is_filtered': True}
+    return {'filtered_response': resp, 'is_filtered': False}
 
 def choices_fuzzy_match(resp, choices, gold):
     matched_choices = []
@@ -73,13 +73,39 @@ def choices_fuzzy_match(resp, choices, gold):
             similarities.append(similarity)
 
     if len(matched_choices) == len(choices) and any([i > 0.95 for i in similarities]) and gold_length != len(choices):
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
 
     if matched_choices:
         combined = list(zip(matched_choices, similarities))
         sorted_combined = sorted(combined, key=lambda x: x[1], reverse=True)
         sorted_matched_choices, sorted_similarities = zip(*sorted_combined)
         sorted_matched_choices = list(sorted_matched_choices)
-        return {'value': list(dict.fromkeys(sorted_matched_choices)), 'is_filtered': True}
+        return {'filtered_response': list(dict.fromkeys(sorted_matched_choices)), 'is_filtered': True}
     else:
-        return {'value': resp, 'is_filtered': False}
+        return {'filtered_response': resp, 'is_filtered': False}
+
+def opt_or_data_type(opt_type, data_type):
+    return opt_type if opt_type is not None else data_type
+
+CODE_WARNING = """
+################################################################################
+                                  !!!WARNING!!!
+################################################################################
+The "code_eval" metric executes untrusted model-generated code in Python.
+Although it is highly unlikely that model-generated code will do something
+overtly malicious in response to this test suite, model-generated code may act
+destructively due to a lack of model capability or alignment.
+Users are strongly encouraged to sandbox this evaluation suite so that it
+does not perform destructive actions on their host or network. For more
+information on how OpenAI sandboxes its code, see the paper "Evaluating Large
+Language Models Trained on Code" (https://arxiv.org/abs/2107.03374).
+
+Once you have read this disclaimer and taken appropriate precautions,
+set the environment variable HF_ALLOW_CODE_EVAL="1". Within Python you can to this
+with:
+
+>>> import os
+>>> os.environ["HF_ALLOW_CODE_EVAL"] = "1"
+
+################################################################################\
+"""

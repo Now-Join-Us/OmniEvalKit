@@ -52,6 +52,7 @@ _MODULE2MODEL = {
     'llm.thudm.glm': ['glm-10b'],
     'llm.thudm.glm_4_chat': ['glm-4-9b-chat'],
     'llm.thudm.chatglm': ['chatglm-6b', 'chatglm2-6b', 'chatglm3-6b'],
+    'llm.microsoft.phi3_5': ['Phi-3.5-mini-instruct'],
     'llm.microsoft.phi_instruct': ['Phi-3-mini-4k-instruct', 'Phi-3-mini-128k-instruct', 'Phi-3-small-8k-instruct', 'Phi-3-small-128k-instruct'],
     'llm.microsoft.ocra2': ['Orca-2-7b'],
     'llm.microsoft.phi2': ['phi-2'],
@@ -95,7 +96,8 @@ _MODULE2DATASET = {
     'mm_cc_bench': ['mmbench', 'ccbench'],
     'truthfulqa_mc2': ['truthfulqa_mc2', 'truthfulqa_multilingual_mc2'],
     'bbh': ['bbh'],
-    'drop': ['drop']
+    'drop': ['drop'],
+    'humaneval': ['humaneval-prompt']
 }
 
 STANDARD_DATASET2SHOTS = {

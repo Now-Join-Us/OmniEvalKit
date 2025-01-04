@@ -1,7 +1,7 @@
 # This file includes functions adapted from the lm-evaluation-harness repository (https://github.com/EleutherAI/lm-evaluation-harness).
 # Original work by Gao et al., licensed under MIT license.
 # Copyright (c) 2020 EleutherAI
-from dataloaders.base import Dataset
+from dataloaders.general import Dataset
 import numpy as np
 
 class TruthfulQA(Dataset):

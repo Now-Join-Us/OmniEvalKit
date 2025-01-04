@@ -1,4 +1,4 @@
-from dataloaders.base import Dataset
+from dataloaders.general import Dataset
 
 class COCODataset(Dataset):
     def __init__(self, dataset_name=None, dataset_file_path=None, rank=None, world_size=None, image_url=None, preloaded_image_num=1):
