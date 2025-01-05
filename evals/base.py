@@ -54,7 +54,6 @@ class EvalTool(object):
 
         elif self.calculate_type == 'each_then_overall':
             scores = []
-            dataset_subset = []
             for idx, (data, filtered_dict) in enumerate(tqdm(zip(self.dataset, filtered_responses), total=len(self.dataset))):
                 metric2score = self.dataset.caculate(
                     data,
