@@ -9,6 +9,7 @@ from models.base import get_model
 from dataloaders.base import get_data
 from evals.base import EvalTool
 from utils import setup_args, Response, save_json, get_rank_and_world_size, rank_zero_check, calculate_model_flops, batchify, get_log_path, logger
+from torch.utils.data import Subset
 
 def get_model_dataset_to_inference(model, data, log_path, infer_type, rank, world_size, disable_infer=False):
     model_data_not_inferred, model_data_is_inferred = [], []
@@ -17,6 +18,8 @@ def get_model_dataset_to_inference(model, data, log_path, infer_type, rank, worl
             model_data_pair = ((model_name, model_path), (dataset_name, dataset_file_path))
             responses = Response(get_log_path(log_path, infer_type, model_name, dataset_name), rank=rank, world_size=world_size)
             dataset = get_data(dataset_name=dataset_name, dataset_file_path=dataset_file_path, rank=rank, world_size=world_size, preloaded_image_num=0)
+            # dataset = dataset[:2]
+            # import pdb; pdb.set_trace()
             is_inferred = True
             for idx, data in enumerate(dataset):
                 if data['id'] not in responses.keys():
@@ -45,7 +48,8 @@ if __name__ == "__main__":
 
         responses = Response(log_path, save_steps=args.save_steps, rank=rank, world_size=world_size)
         dataset = get_data(dataset_name=dataset_name, dataset_file_path=dataset_file_path, rank=rank, world_size=world_size, image_url=args.image_url, preloaded_image_num=args.preloaded_image_num)
-
+        # import pdb; pdb.set_trace()
+        # dataset = dataset[:2]
         if args.set_calculate_flops:
             calculate_model_flops(model_wrapper, model_name)
 
@@ -78,6 +82,8 @@ if __name__ == "__main__":
     for (model_name, model_path), (dataset_name, dataset_file_path) in tqdm(model_data_is_inferred):
         logger.info(f'[EVAL] {model_name} on {dataset_name}')
         dataset = get_data(dataset_name=dataset_name, dataset_file_path=dataset_file_path, rank=rank, world_size=world_size, preloaded_image_num=0)
+        # indices = list(range(2))
+        # dataset = Subset(dataset, indices)
         log_path = get_log_path(args.log_path, args.infer_type, model_name, dataset_name)
         responses = Response(log_path, save_steps=args.save_steps, rank=rank, world_size=world_size)
         scored_dataset_file_path, statistics_path = os.path.join(log_path, f'scored_dataset.json'), os.path.join(log_path, f'statistics.json')

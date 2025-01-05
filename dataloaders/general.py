@@ -107,7 +107,7 @@ class Dataset(object):
     def estimate(self, scores, categories, sub_categories, **inner_kwargs):
         est_type = inner_kwargs.get('est_type', None)
         if est_type == 'pass_at_k':
-            return self.estimator.sum_or_avg(scores, **inner_kwargs)
+            return self.estimator.avg_k(scores, **inner_kwargs)
         return self.estimator.sum_or_avg(scores, categories=categories, sub_categories=sub_categories, e_type='avg', **inner_kwargs)
 
 
