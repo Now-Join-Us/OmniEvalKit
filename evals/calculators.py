@@ -118,8 +118,9 @@ class BaseCalculator:
             n_samples = 0
             results = defaultdict(list)
 
-            
+            # import pdb; pdb.set_trace()
             for candidate in candidates:
+                
                 test_program = candidate + "\n" + test_case
                 args = (test_program, timeout, task_id, completion_id[task_id])
                 future = executor.submit(check_correctness, *args)
@@ -137,6 +138,7 @@ class BaseCalculator:
             passed = [r[1]["passed"] for r in result]
             total.append(len(passed))
             correct.append(sum(passed))
+        # import pdb; pdb.set_trace()
         total = np.array(total)
         correct = np.array(correct)
 

@@ -7,7 +7,7 @@ MAX_GEN_TOKS = 1024
 
 MODEL_PATH = 'your_models_path/models'
 DATA_PATH = './data'
-OUTPUT_PATH = 'your_outputs_path/outputs'
+OUTPUT_PATH = 'debug/outputs'
 
 datasets = \
     ['hellaswag', 'mmlu', 'arc_challenge', 'arc_easy', 'winogrande', 'truthfulqa_mc1', 'truthfulqa_mc2', 'aclue', 'anli', 'boolq', 'cb', 'cmmlu', 'cola', 'crows_pairs', 'copa', 'glue', 'lambada', 'mathqa', 'mnli', 'mrpc', 'openbookqa', 'piqa'] + \

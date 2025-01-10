@@ -53,14 +53,14 @@ if __name__ == "__main__":
         if args.set_calculate_flops:
             calculate_model_flops(model_wrapper, model_name)
 
+        infer_module = importlib.import_module(f'infer.{args.infer_type}') # 等价于 from infer.chain_of_thought
+        center = getattr(infer_module, 'infer_core')(model_wrapper, **args.infer_args) # 等价于 from infer.chain_of_thought import infer_core as center
         for idx, data_idx in enumerate(tqdm(range(0, len(dataset), args.batch_size))):
             data = batchify(dataset, data_idx, args.batch_size)
             if isinstance(data, dict) and data['id'] in responses.keys():
                 continue
-
-            infer_module = importlib.import_module(f'infer.{args.infer_type}') # 等价于 from infer.chain_of_thought
-            center = getattr(infer_module, 'infer_core')(model_wrapper, **args.infer_args) # 等价于 from infer.chain_of_thought import infer_core as center
             resp = center.infer(data=data, **args.infer_args)
+            # import pdb; pdb.set_trace()
             if isinstance(data, list):
                 responses.update({i_data['id']: resp[i_data['id']] for i_data in data})
             else:
@@ -78,7 +78,8 @@ if __name__ == "__main__":
             tokenizer_args=args.filter_tokenizer_args
         )
         filter_model_wrapper.to(device).eval().tie_weights()
-
+    # elif 'code' in args.filter_type:
+        
     for (model_name, model_path), (dataset_name, dataset_file_path) in tqdm(model_data_is_inferred):
         logger.info(f'[EVAL] {model_name} on {dataset_name}')
         dataset = get_data(dataset_name=dataset_name, dataset_file_path=dataset_file_path, rank=rank, world_size=world_size, preloaded_image_num=0)

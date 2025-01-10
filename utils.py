@@ -207,7 +207,7 @@ def setup_args():
     )
 
     parser.add_argument(
-        "--filter_type", type=str, default="regex", choices=['regex', 'model', 'regex,model', 'direct']
+        "--filter_type", type=str, default="regex", choices=['regex', 'model', 'regex,model', 'direct', 'code']
     )
     parser.add_argument(
         "--filter_args", type=str, default=""

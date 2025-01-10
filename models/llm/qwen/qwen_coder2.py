@@ -3,7 +3,7 @@ from models.base import ModelWrapper
 class QwenCoder2(ModelWrapper):
     def __init__(self, model_path, model_args, tokenizer_args):
         super().__init__(model_path=model_path, model_args=model_args, tokenizer_args=tokenizer_args)
-
+        
     def generate_text_only(self, conversation, **kwargs):
         inputs = self.tokenizer(conversation, return_tensors='pt').to(self.model.device)
         pred = self.model.generate(**inputs)
@@ -11,9 +11,21 @@ class QwenCoder2(ModelWrapper):
         return response
 
     def generate_k_tokens(self, conversation, **gen_kwargs):
-        inputs = self.tokenizer(conversation, return_tensors='pt').to(self.model.device)
+        messages = [
+            {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {"role": "user", "content": conversation}
+        ]
+
+        text = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
+
+        # inputs = self.tokenizer(conversation, return_tensors='pt').to(self.model.device)
         generated_tokens = self.model.generate(
-            **inputs,
+            **model_inputs,
             # num_return_sequences=gen_kwargs.get('num_return_sequences', 1),
             **gen_kwargs
         )
