@@ -103,6 +103,7 @@ class InferCodeCenter(InferCenter):
                 if eos in output:
                     min_index = min(min_index, output.index(eos))
             outputs.append(output[:min_index].replace("\t", "    "))
+        # import pdb; pdb.set_trace()
         return outputs
     
     def infer(self, data, device=torch.device('cuda'), **kwargs):

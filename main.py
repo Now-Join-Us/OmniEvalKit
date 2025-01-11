@@ -87,6 +87,7 @@ if __name__ == "__main__":
         # dataset = Subset(dataset, indices)
         log_path = get_log_path(args.log_path, args.infer_type, model_name, dataset_name)
         responses = Response(log_path, save_steps=args.save_steps, rank=rank, world_size=world_size)
+        # import pdb; pdb.set_trace()
         scored_dataset_file_path, statistics_path = os.path.join(log_path, f'scored_dataset.json'), os.path.join(log_path, f'statistics.json')
 
         tool = EvalTool(

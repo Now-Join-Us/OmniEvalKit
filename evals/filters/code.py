@@ -19,6 +19,7 @@ class CodeFilter(object):
         self.is_instruct = kwargs.get('is_instruct', False)
         
     def apply(self, response, data, question_type=None, **kwargs):
+        # import pdb; pdb.set_trace()
         if isinstance(response, str):
             response = [response]
         assert isinstance(response, list)

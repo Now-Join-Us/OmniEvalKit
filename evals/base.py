@@ -115,7 +115,8 @@ class EvalTool(object):
 
         ## 0. 一些预处理 ##
         responses = [responses[data['id']] for data in self.dataset if data['id'] in responses.keys()] # 提取所有已经获得的 response
-        if isinstance(responses[0], list): # 展平list
+        # import pdb; pdb.set_trace()
+        if isinstance(responses[0], list) and 'codegen' not in self.dataset[0]['category']: # 展平list 这里不应该
             responses = sum(responses, [])
 
         if any([data['gold'] is None for data in self.dataset]):
