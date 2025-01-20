@@ -11,7 +11,7 @@ class OPT(ModelWrapper):
         )
 
     def generate_text_only(self, conversation, **kwargs):
-        response = self.pipe(conversation, max_length=1024)
+        response = self.pipe(conversation, max_length=512)
 
         return response[0]['generated_text']
 

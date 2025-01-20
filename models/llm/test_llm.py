@@ -13,8 +13,9 @@ class TestLLM(ModelWrapper):
         super().__init__()
         self.model = MyDummyModel()
         self.tokenizer = None
+        self.force_use_generate = True
 
     def generate_text_only(self, conversation, **kwargs):
-        return "Test of response.\nLine 1.\nLine 2."
+        return "Test of response 1.2.\nLine 1.\nLine 2."
 
 model_core = TestLLM

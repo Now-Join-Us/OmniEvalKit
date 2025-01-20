@@ -10,7 +10,7 @@ class Stablebeluga2(ModelWrapper):
 
         prompt = f"{system_prompt}### User: {conversation}\n\n### Assistant:\n"
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-        output = self.model.generate(**inputs, do_sample=True, top_p=0.95, top_k=0, max_new_tokens=256)
+        output = self.model.generate(**inputs, do_sample=True, top_p=0.95, top_k=0, max_new_tokens=512)
 
         return self.tokenizer.decode(output[0], skip_special_tokens=True)
 

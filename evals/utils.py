@@ -1,4 +1,3 @@
-import re
 import string
 from difflib import SequenceMatcher
 
@@ -64,7 +63,7 @@ def choices_fuzzy_match(resp, choices, gold):
     if isinstance(gold, str) or isinstance(gold, int):
         gold_length = 1
     elif isinstance(gold, list):
-    	gold_length = 0 if len(gold) == 0 or isinstance(gold[0], str) else sum(gold)
+        gold_length = 0 if len(gold) == 0 or isinstance(gold[0], str) else sum(gold)
 
     for i in range(len(choices)):
         similarity = fuzzy_match(choices[i], sentence=resp)
@@ -84,5 +83,8 @@ def choices_fuzzy_match(resp, choices, gold):
     else:
         return {'filtered_response': resp, 'is_filtered': False}
 
+<<<<<<< HEAD
+=======
 def opt_or_base_type(opt_type, base_type):
     return opt_type if opt_type is not None else base_type
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185

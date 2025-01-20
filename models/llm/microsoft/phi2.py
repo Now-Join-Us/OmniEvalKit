@@ -7,7 +7,7 @@ class Phi2(ModelWrapper):
     def generate_text_only(self, conversation, **kwargs):
         inputs = self.tokenizer(conversation, return_tensors="pt", return_attention_mask=False)
 
-        outputs = self.model.generate(**inputs, max_length=200)
+        outputs = self.model.generate(**inputs, max_length=512)
         response = self.tokenizer.batch_decode(outputs)[0]
         return response
 

@@ -1,6 +1,8 @@
-from dataloaders.base import Dataset
 import numpy as np
 from collections import defaultdict
+
+from dataloaders.base import Dataset
+from dataloaders.estimators import sum_or_avg
 
 class HallusionDataset(Dataset):
     def __init__(self, dataset_name=None, dataset_file_path=None, rank=None, world_size=None, image_url=None, preloaded_image_num=1):
@@ -64,7 +66,7 @@ class HallusionDataset(Dataset):
                                                          masked_figure_indices, masked_question_indices)
             return category2metric2static
 
-        statistics = self.estimator.sum_or_avg(scores=scores, categories=categories, sub_categories=sub_categories,
+        statistics = sum_or_avg(scores=scores, categories=categories, sub_categories=sub_categories,
                                                e_type='avg')
         set_indices = [data['set_id'] for data in self]
         figure_indices = [data['figure_id'] for data in self]

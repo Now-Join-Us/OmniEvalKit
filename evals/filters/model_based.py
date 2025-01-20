@@ -1,17 +1,31 @@
+<<<<<<< HEAD
+from utils import detect_language
+from prompts.base import translate_prompt, FILTER_TYPE2LANGUAGE2PROMPT
+from evals.filters import RegexFilter
+=======
 from configs import FILTER_TYPE2LANGUAGE2PROMPT
 from dataloaders.utils import detect_language, translate_prompt
 from evals.filters.regex import RegexFilter
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
 
 class ModelBasedFilter(RegexFilter):
     def __init__(
         self,
+<<<<<<< HEAD
+        dataset_name,
+=======
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
         model,
         custom_patterns=[],
     ) -> None:
         """
         pass a string `regex` to run `re.compile(r"regex")` on.
         """
+<<<<<<< HEAD
+        super().__init__(dataset_name)
+=======
         super().__init__()
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
         self.model = model
 
         def _get_prompt(question_type):
@@ -66,5 +80,8 @@ class ModelBasedFilter(RegexFilter):
         else:
             raise NotImplementedError
         return matched
+<<<<<<< HEAD
+=======
 
 filter_core = ModelBasedFilter
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185

@@ -13,7 +13,7 @@ class Falcon(ModelWrapper):
     def generate_text_only(self, conversation, **kwargs):
         sequences = self.pipeline(
             conversation,
-            max_length=200,
+            max_length=512,
             do_sample=True,
             top_k=10,
             num_return_sequences=1,

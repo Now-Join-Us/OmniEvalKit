@@ -4,7 +4,10 @@ import string
 from utils import most_common_length_strings
 from evals.utils import choices_fuzzy_match
 
+<<<<<<< HEAD:evals/filters/regex.py
+=======
 
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185:evals/filters/regex.py
 class RegexFilter(object):
     def __init__(
         self,
@@ -416,7 +419,12 @@ class RegexFilter(object):
                 raise NotImplementedError(f'Unhandled question type: {question_type}')
         else:
             raise NotImplementedError(f'Unhandled response type: {type(response)}')
+<<<<<<< HEAD:evals/filters/regex.py
+
+        return matched
+=======
 
         return matched
 
 filter_core = RegexFilter
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185:evals/filters/regex.py

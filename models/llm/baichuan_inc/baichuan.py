@@ -8,7 +8,7 @@ class Baichuan(ModelWrapper):
     def generate_text_only(self, conversation, **kwargs):
         inputs = self.tokenizer(f'{conversation}->', return_tensors='pt').to(self.model.device)
 
-        pred = self.model.generate_text_only(**inputs, max_new_tokens=64, repetition_penalty=1.1)
+        pred = self.model.generate_text_only(**inputs, max_new_tokens=512, repetition_penalty=1.1)
         response = self.tokenizer.decode(pred.cpu()[0], skip_special_tokens=True)
         return response
 

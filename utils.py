@@ -1,7 +1,6 @@
 # Copyright (C) 2024 AIDC-AI
 from configs import _DEFAULT_MAX_LENGTH, MODEL_PATH, DATA_PATH, DATASET2FILE, OUTPUT_PATH
 from typing import List, Any, Dict
-import transformers
 import json
 import re
 import os
@@ -14,7 +13,21 @@ from pathlib import Path
 from pprint import pprint
 from PIL import Image
 from collections import Counter
+<<<<<<< HEAD
+
+
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(name)s %(levelname)s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+
+logger = logging.getLogger(__name__)
+=======
 from collections.abc import Iterable
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
 
 
 import logging
@@ -207,6 +220,24 @@ def setup_args():
     )
 
     parser.add_argument(
+<<<<<<< HEAD
+        "--filter_type", type=str, default="RegexFilter"
+    )
+    parser.add_argument(
+        "--filter_args", type=str, default=""
+    )
+    parser.add_argument(
+        "--filter_model", type=str, default=None, help="filter models e.g. `Qwen/Qwen1.5-7B`"
+    )
+    parser.add_argument(
+        "--calculate_func", type=str, default=None,
+    )
+    parser.add_argument(
+        "--estimate_func", type=str, default=None, help="function for estimation"
+    )
+    parser.add_argument(
+        "--data_url", type=str, default=None
+=======
         "--data_url", type=str, default=None
     )
     parser.add_argument('--only_do_eval', action='store_true')
@@ -218,6 +249,7 @@ def setup_args():
     )
     parser.add_argument(
         "--filter_model", type=str, default=None, help="filter models e.g. `Qwen/Qwen1.5-7B`"
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
     )
     parser.add_argument(
         "--filter_model_args",
@@ -233,7 +265,11 @@ def setup_args():
     )
     parser.add_argument(
         "--eval_args", type=str, default=""
+<<<<<<< HEAD
+    )
+=======
     ) # question_type=xxx,request_type=xxx,calculate_type=xxx,estimate_type=each_then_overall (or overall)
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
     parser.add_argument(
         "--batch_size",
         default=1,
@@ -354,6 +390,8 @@ def load_image(image_file_path):
 def get_log_path(base_path, infer_type, model_name, dataset_name):
     return os.path.join(base_path, model_name, dataset_name if infer_type == 'direct' else f'{dataset_name}_{infer_type}')
 
+<<<<<<< HEAD
+=======
 def flatten_list(nested_list):
     flattened = []
     for item in nested_list:
@@ -363,6 +401,7 @@ def flatten_list(nested_list):
             flattened.extend(flatten_list(item))
     return flattened
 
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185
 def most_common_length_strings(strings):
     ## 计算出现频率最高的字符串长度，并返回该长度的第一个字符串 ##
     lengths = [len(s) for s in strings]
@@ -370,3 +409,21 @@ def most_common_length_strings(strings):
     most_common_length = length_count.most_common(1)[0][0]
     result = [s for s in strings if len(s) == most_common_length]
     return result[0]
+<<<<<<< HEAD
+
+def detect_language(text):
+    arabic_re = re.compile(r'[\u0600-\u06FF]')
+    chinese_re = re.compile(r'[\u4e00-\u9fff]')
+    english_re = re.compile(r'[a-zA-Z]')
+    russian_re = re.compile(r'[\u0400-\u04FF]')
+
+    if chinese_re.search(text):
+        return 'ZH' # Mandarin Chinese (Simplified)
+    elif arabic_re.search(text):
+        return 'AR' # Arabic
+    elif russian_re.search(text):
+        return 'RU' # Russian
+
+    return 'EN'
+=======
+>>>>>>> aef4b81d4d7526f3d22d331a4e308ff367100185

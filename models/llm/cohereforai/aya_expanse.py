@@ -18,7 +18,7 @@ class aya_expanse(ModelWrapper):
 
         gen_tokens = self.model.generate(
             input_ids, 
-            max_new_tokens=100, 
+            max_new_tokens=512, 
             do_sample=True, 
             temperature=0.3,
             )

@@ -6,7 +6,7 @@ class QwenBase(ModelWrapper):
 
     def generate_text_only(self, conversation, **kwargs):
         inputs = self.tokenizer(conversation, return_tensors='pt').to(self.model.device)
-        pred = self.model.generate(**inputs)
+        pred = self.model.generate(**inputs, max_new_tokens=512)
         response = self.tokenizer.decode(pred.cpu()[0], skip_special_tokens=True)
         return response
 
