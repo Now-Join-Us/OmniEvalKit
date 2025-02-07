@@ -7,6 +7,8 @@ class QwenChat(ModelWrapper):
         super().__init__(model_path=model_path, model_args=model_args, tokenizer_args=tokenizer_args)
 
     def generate_text_only(self, conversation, **kwargs):
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
         messages = [
             {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
             {"role": "user", "content": conversation}

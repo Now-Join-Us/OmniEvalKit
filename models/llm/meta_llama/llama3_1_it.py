@@ -1,7 +1,7 @@
 from models.base import ModelWrapper
 from transformers import pipeline
 
-class LLaMA3_1Base(ModelWrapper):
+class LLaMA3_1IT(ModelWrapper):
     def __init__(self, model_path, model_args, tokenizer_args, **kwargs):
         super().__init__(model_path=model_path, model_args=model_args, tokenizer_args=tokenizer_args)
         self.pipeline = pipeline(
@@ -27,4 +27,4 @@ class LLaMA3_1Base(ModelWrapper):
 
         return response
 
-model_core = LLaMA3_1Base
+model_core = LLaMA3_1IT

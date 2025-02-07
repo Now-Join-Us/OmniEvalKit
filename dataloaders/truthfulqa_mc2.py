@@ -8,7 +8,7 @@ class TruthfulQA(Dataset):
     def __init__(self, dataset_name=None, dataset_file_path=None, rank=None, world_size=None, image_url=None, preloaded_image_num=1):
         super().__init__(dataset_name=dataset_name, dataset_file_path=dataset_file_path, rank=rank, world_size=world_size, image_url=image_url, preloaded_image_num=preloaded_image_num)
 
-    def calculate(self, data, base_dict, base_calculate_kwargs):
+    def caculate(self, data, base_dict, base_calculate_kwargs):
         filtered_r, gold = base_calculate_kwargs['filtered_r'], base_calculate_kwargs['gold']
         lls, is_greedy = zip(*filtered_r)
 

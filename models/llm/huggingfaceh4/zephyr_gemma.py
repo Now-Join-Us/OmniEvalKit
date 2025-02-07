@@ -21,7 +21,7 @@ class ZephyrGemma(ModelWrapper):
 
         outputs = self.pipe(
             messages,
-            max_new_tokens=128,
+            max_new_tokens=512,
             do_sample=True,
             temperature=0.7,
             top_k=50,

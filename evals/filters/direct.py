@@ -1,8 +1,7 @@
 
 class DirectFilter(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs) -> None:
         ...
-    def apply(self, response, **kwargs):
-        return {'filtered_response': response, 'is_filtered': True}
 
-filter_core = DirectFilter
+    def apply(self, response, **kwargs):
+        return response

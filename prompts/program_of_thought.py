@@ -1,6 +1,3 @@
-from dataloaders.utils import detect_language
-
-COT_PROMPT = "{prompt_instruction} {guide_words}"
 
 POT_PROMPT = {
     "finqa_4": """Read the following text and table, and then write code to answer a question:
@@ -476,10 +473,6 @@ POT_PROMPT = {
     {prompt_instruction}
     """
 }
-
-def cot_prompt(instruction):
-    language = detect_language(instruction)
-    return COT_PROMPT.format(instruction.rstrip(), TYPE2LANGUAGE2PROMPT['cot'][language])
 
 def pot_prompt(instruction, dataset_name):
     return POT_PROMPT[dataset_name].format(instruction)

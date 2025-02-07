@@ -1,8 +1,10 @@
+
+
 export multimodal_datasets='ai2d_test,ccbench,hallusionbench,mathvista_mini,mmbench_dev_cn,mmbench_dev_en,mme,mmmu_val,mmstar,mmvet,ocrbench,realworldqa,scienceqa_test,scienceqa_val,seedbench_img'
 export text_only__datasets='arc_challenge_25,arc_easy_25,boolq,cmmlu,mmlu_5,openbookqa,anli,cola,copa,glue,hellaswag_10,aclue,piqa,truthfulqa_mc2,mathqa,hellaswag_multilingual_sampled,xstorycloze_sampled,eq_bench,bbh_3,logieval,drop'
 
-export text_only__datasets='demo_text_only_generate,demo_text_only_multiple_choice'
 export multimodal_datasets='demo_vqa_generate'
+export text_only__datasets='demo_text_only_generate,demo_text_only_multiple_choice'
 
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Phi-3.5-vision-instruct --model_args device_map=cuda,trust_remote_code=True,torch_dtype=auto,_attn_implementation=flash_attention_2 --tokenizer_args trust_remote_code=True,num_crops=4 --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model MiniCPM-V-2_6 --model_args device_map=cuda,trust_remote_code=True,torch_dtype=torch.float16 --tokenizer_args trust_remote_code=True --time_str 03_26_00_00_00
@@ -105,4 +107,12 @@ CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Ovis
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Ovis-Clip-Llama3-8B --model_args torch_dtype=torch.bfloat16,multimodal_max_length=8192,trust_remote_code=True --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $text_only__datasets --model Qwen2-72B-Instruct --model_args torch_dtype=torch.bfloat16,device_map=auto --time_str 03_26_00_00_00
 CUDA_VISIBLE_DEVICES="0" python main.py --data $multimodal_datasets --model Wings --model_args trust_remote_code=True --model_args json_path=path_of_args.json --time_str 03_26_00_00_00
-CUDA_VISIBLE_DEVICES="0" python main.py --data bbh_3 --model TestLLM --infer_type direct --infer_args temp=ok --time_str 03_26_00_00_00
+
+## Demo 执行指令 ##
+CUDA_VISIBLE_DEVICES="0" python main.py --data demo_text_only_generate --model TestLLM --infer_type direct --infer_args temp=ok --time_str 03_26_00_00_00
+
+## 可以通过 eval_args 来指定 所有数据测评的 question_type、request_type、calculate_range、calculate_func ##
+# --eval_args question_type=multiple_choice,request_type=multiple_choice,calculate_range=each_then_overall,calculate_func=code_exec
+
+export HF_ALLOW_CODE_EVAL=1
+CUDA_VISIBLE_DEVICES="0" python main.py --data 'humaneval-prompt' --model Qwen1.5-7B-Chat --model_args device_map=auto,torch_dtype=auto --time_str 03_26_00_00_00 --infer_args do_sample=False,max_new_tokens=768 --infer_type coder --filter_type CodeFilter --eval_args est_type=pass_at_k,calculate_func=code_eval --estimate_func avg_k

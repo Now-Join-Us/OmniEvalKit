@@ -2,47 +2,11 @@ import torch
 import torch.nn.functional as F
 from abc import ABC, abstractmethod
 
-from models.base import tok_encode, tok_decode, tok_batch_encode, _model_generate
-from dataloaders.prompts import cot_prompt, pot_prompt
+from utils import get_max_length, logger
+from prompts import cot_prompt, pot_prompt
+from configs import MAX_GEN_TOKS, GEN_DATASET2UNTIL, GEN_DO_SAMPLE, GEN_TEMPERATURE
+from infer.utils import tok_encode, tok_decode, tok_batch_encode, model_generate, encode_pair
 
-from utils import get_max_length
-from configs import MAX_GEN_TOKS, GEN_DATASET2UNTIL, GEN_DO_SAMPLE, GEN_TEMPERATURE, TYPE2LANGUAGE2PROMPT
-
-def _encode_pair(tokenizer, context, continuation):
-    n_spaces = len(context) - len(context.rstrip())
-    if n_spaces > 0:
-        continuation = context[-n_spaces:] + continuation
-        context = context[:-n_spaces]
-
-    whole_enc = tok_encode(tokenizer, context + continuation)
-    context_enc = tok_encode(tokenizer, context)
-
-    context_enc_len = len(context_enc)
-    continuation_enc = whole_enc[context_enc_len:]
-
-    return context_enc, continuation_enc
-
-
-def get_multiple_choice_encode(tokenizer, data, device=torch.device('cuda')):
-    contexts, choices = data['prompt_instruction'], data['prompt_choices']
-    if isinstance(contexts, str):
-        contexts = [contexts] * len(choices)
-
-    resp = []
-    context_encode_list, continuation_encode_list = [], []
-    for context, continuation in zip(contexts, choices):
-        if context == "":
-            # BOS or EOS as context
-            context_enc, continuation_enc = (
-                [tokenizer.eos_token_id],
-                tok_encode(tokenizer, continuation),
-            )
-        else:
-            context_enc, continuation_enc = _encode_pair(tokenizer, context, continuation)
-        context_encode_list.append(context_enc)
-        continuation_encode_list.append(continuation_enc)
-
-    return context_encode_list, continuation_encode_list
 
 
 class InferCenter(object):
@@ -95,7 +59,7 @@ class InferCenter(object):
         # perform batched generation
         with torch.no_grad():
             model.eval()
-            cont = _model_generate(
+            cont = model_generate(
                 model,
                 tokenizer,
                 context=context_enc,
@@ -131,25 +95,27 @@ class InferCenter(object):
 
         resp = []
         _, image = self.model_wrapper.preprocess_vqa(data)
+
         for context, continuation in zip(contexts, choices):
             whole_instruction = self.model_wrapper.preprocess_prompt_instruction(
                 prompt_instruction=context + continuation,
                 dataset_name=data['name'],
-                img_num=len(data['image_path'])
+                img_num=len(data.get('image_path', []))
             )
             context_instruction = self.model_wrapper.preprocess_prompt_instruction(
                 prompt_instruction=context,
                 dataset_name=data['name'],
-                img_num=len(data['image_path'])
+                img_num=len(data.get('image_path', []))
             )
 
             with torch.no_grad():
                 self.model_wrapper.eval()
-                whole_enc, _ = self.model_wrapper.get_generated(whole_instruction, image)
+                whole_enc, infer_kwargs = self.model_wrapper.get_generated(whole_instruction, image)
                 context_enc, _ = self.model_wrapper.get_generated(context_instruction, image)
 
                 outputs = self.model_wrapper.model(
                     **whole_enc,
+                    **infer_kwargs
                 )
                 logits = F.log_softmax(outputs.logits, dim=-1)
 
@@ -178,7 +144,7 @@ class InferCenter(object):
                     tok_encode(tokenizer, continuation),
                 )
             else:
-                context_enc, continuation_enc = _encode_pair(tokenizer, context, continuation)
+                context_enc, continuation_enc = encode_pair(tokenizer, context, continuation)
 
             inp = torch.tensor(
                 (context_enc + continuation_enc)[-(max_length + 1) :][:-1],
@@ -216,27 +182,31 @@ class InferCenter(object):
             conversation = self.model_wrapper.preprocess_vqa(data) # MLLM on multimodal data
             return self.model_wrapper.generate_vqa(conversation)
         else:
-            return self.generate_text_only(self.model_wrapper, data, device) # LLM on multimodal data
+            return self.generate_text_only(data, device) # LLM on multimodal data
 
     def infer_direct(self, data, device=torch.device('cuda'), force_use_generate=False):
-        is_multimodal = 'image_path' in data.keys()
+        is_multimodal = 'image_path' in data.keys() or 'table' in data.keys()
 
         if self.model_wrapper.force_use_generate or isinstance(data, list):
+            logger.info('使用 generate_by_self 自定义生成')
             return self.generate_by_self('vqa' if is_multimodal else 'text_only', data, device)
 
         if force_use_generate or data['request_type'] == 'generate_until':
             if is_multimodal:
+                logger.info('使用 generate_vqa 自定义多模态生成')
                 return self.generate_vqa(data, device) # MLLM or LLM on multimodal data
             else: # LLM or MLLM on text-only data
                 if self.model_wrapper.is_overridden_generate_text_only(self.model_wrapper):
+                    logger.info('使用 generate_by_self text_only 自定义纯文本生成')
                     return self.generate_by_self('text_only', data, device)
+                logger.info('使用 generate_text_only 默认纯文本生成')
                 return self.generate_text_only(data, device)
         elif data['request_type'] == 'loglikelihood':
             if is_multimodal:
                 return self.loglikelihood_vqa(data, device)
             return self.loglikelihood_text_only(data, device)
         else:
-            raise NotImplementedError(f"Unsupported type: {request_type}")
+            raise NotImplementedError(f"Unsupported type: {data['request_type']}")
 
     def infer_chain_of_thought(self, data, device=torch.device('cuda')):
         data['prompt_instruction'] = cot_prompt(data['prompt_instruction'])

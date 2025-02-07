@@ -10,7 +10,7 @@ class Bloomz(ModelWrapper):
 
     def generate_text_only(self, conversation, **kwargs):
         inputs = self.tokenizer.encode(conversation, return_tensors="pt").to(self.model.device)
-        outputs = self.model.generate(inputs)
+        outputs = self.model.generate(inputs, max_new_tokens=512)
         return self.tokenizer.decode(outputs[0])
 
 model_core = Bloomz

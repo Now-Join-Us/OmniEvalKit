@@ -7,7 +7,6 @@ from tqdm import tqdm
 
 from utils import save_pickle, save_json, logger
 
-
 class EvalTool(object):
     """Calculate metric
 
@@ -20,23 +19,29 @@ class EvalTool(object):
     def __init__(self,
         dataset_name, dataset,
         filter_type=None, filter_args={}, filter_model_wrapper=None,
-        question_type=None, request_type=None, calculate_type=None, estimate_type='each_then_overall',
-        **kwargs
+        calculate_range='each_then_overall',
+        question_type=None, request_type=None, calculate_func=None, estimate_func=None,
+        **inner_kwargs
         ):
         ## 构建 filter 模块 ##
         self.filters = []
         self.filter_types = filter_type.split(',')
         for f_type in self.filter_types:
-            filter_module = importlib.import_module(f'evals.filters.{f_type}') # 等价于 from eval.infer.regex
-            self.filters.append(getattr(filter_module, 'filter_core')(dataset_name=dataset_name, **filter_args)) # 等价于 from infer.regex import filter_core as center
+            self.filters.append(
+                getattr(importlib.import_module(f'evals.filters'), f_type)(
+                    dataset_name=dataset_name, **filter_args
+                )
+            ) # => from evals.filters import RegexFilter as center
 
         self.dataset_name = dataset_name
         self.dataset = dataset
         self.fallback = '[invalid]'
+        self.calculate_range = calculate_range
         self.question_type = question_type
         self.request_type = request_type
-        self.calculate_type = calculate_type
-        self.estimate_type = estimate_type
+        self.calculate_func = calculate_func
+        self.estimate_func = estimate_func
+        self.inner_kwargs = inner_kwargs
 
     def calculate_score(self, filtered_responses):
         """Calculate the correlation metric (score) for each
@@ -47,20 +52,21 @@ class EvalTool(object):
         Returns:
             Contains two, one is the metric (score) for each; the other is answers (to save)
         """
-        if self.estimate_type == 'overall':
+        if self.calculate_range == 'overall':
             ## TODO: 对一整个数据集直接算指标的 ##
-            scores = self.dataset.overall_calculate(self.dataset, filtered_responses)
+            scores = self.dataset.overall_calculate(self.dataset, filtered_responses, **self.inner_kwargs)
 
-        elif self.estimate_type == 'each_then_overall':
+        elif self.calculate_range == 'each_then_overall':
             scores = []
             for idx, (data, filtered_dict) in enumerate(tqdm(zip(self.dataset, filtered_responses), total=len(self.dataset))):
-                metric2score = self.dataset.calculate(
+                metric2score = self.dataset.caculate(
                     data,
                     filtered_dict['filtered_response'],
                     filtered_dict['is_filtered'],
                     question_type=self.question_type,
                     request_type=self.request_type,
-                    calculate_type=self.calculate_type
+                    calculate_func=self.calculate_func,
+                    **self.inner_kwargs
                 )
                 scores.append(metric2score)
             return scores
@@ -76,11 +82,17 @@ class EvalTool(object):
         Returns:
             metric for the entire dataset
         """
-        if self.estimate_type == 'each_then_overall':
+        if self.calculate_range == 'each_then_overall':
             categories = [data['category'] for data in self.dataset] if 'category' in self.dataset[0].keys() else None
             sub_categories = [data['sub_category'] for data in self.dataset] if 'sub_category' in self.dataset[0].keys() else None
 
-            return self.dataset.estimate(scores, categories, sub_categories)
+            return self.dataset.estimate(
+                scores,
+                categories,
+                sub_categories,
+                estimate_func=self.estimate_func,
+                **self.inner_kwargs
+            )
         else:
             raise NotImplementedError
 
@@ -96,8 +108,8 @@ class EvalTool(object):
 
         filtered_responses = []
         for f in self.filters:
-            for r, entry in zip(responses, self.dataset):
-                filtered_responses.append(f.apply(response=r, data=entry, question_type=self.question_type))
+            for response, data in zip(responses, self.dataset):
+                filtered_responses.append(f.apply(response=response, data=data, question_type=self.question_type, **self.inner_kwargs))
         return filtered_responses
 
     def evaluate(self, responses, full_score_save_path, statistic_save_path):
@@ -114,8 +126,8 @@ class EvalTool(object):
 
         ## 0. 一些预处理 ##
         responses = [responses[data['id']] for data in self.dataset if data['id'] in responses.keys()] # 提取所有已经获得的 response
-        if isinstance(responses[0], list): # 展平list
-            responses = sum(responses, [])
+        # if isinstance(responses[0], list): # 展平list
+        #     responses = sum(responses, [])
 
         if any([data['gold'] is None for data in self.dataset]):
             logger.warning(f'警告：存在一些 gold 为 None，跳过 eval，直接保存结果：{full_score_save_path}')

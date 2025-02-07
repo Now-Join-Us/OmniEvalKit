@@ -23,7 +23,7 @@ class OpenOcra(ModelWrapper):
             transformers_version="4.34.0.dev0")
 
         inputs = self.tokenizer(input_text, return_tensors="pt", return_attention_mask=True).to(self.model.device)
-        outputs = self.model.generate(**inputs, generation_config=generation_config)
+        outputs = self.model.generate(**inputs, generation_config=generation_config, max_new_tokens=512)
 
         response = self.tokenizer.batch_decode(outputs)[0]
         return response

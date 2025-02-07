@@ -11,7 +11,7 @@ class Yi_Chat(ModelWrapper):
         ]
 
         input_ids = self.tokenizer.apply_chat_template(conversation=messages, tokenize=True, return_tensors='pt')
-        output_ids = self.model.generate(input_ids.to(self.model.device), eos_token_id=self.tokenizer.eos_token_id, max_new_tokens=128)
+        output_ids = self.model.generate(input_ids.to(self.model.device), eos_token_id=self.tokenizer.eos_token_id, max_new_tokens=512)
 
         response = self.tokenizer.decode(output_ids[0][input_ids.shape[1]:], skip_special_tokens=True)
         return response

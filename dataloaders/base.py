@@ -1,12 +1,14 @@
 import os
 import string
-from utils import load_json, load_image
-from dataloaders.utils import detect_language, translate_prompt
-from configs import TYPE2LANGUAGE2PROMPT
-from evals.calculators import BaseCalculator
-from evals.estimators import BaseEstimator
-from evals.metrics import EXTRACTMATCH
-from evals.utils import opt_or_base_type
+from utils import load_json, load_image, detect_language
+from prompts.base import translate_prompt, TYPE2LANGUAGE2PROMPT
+import importlib
+from abc import ABC, abstractmethod
+from evals.metrics import EXACT_MATCH
+
+from dataloaders.calculators import loglikelihood, multiple_choice, exact_match, code_eval
+from dataloaders.estimators import sum_or_avg
+
 
 class Dataset(object):
     """
@@ -19,8 +21,6 @@ class Dataset(object):
     def __init__(self, dataset_name=None, dataset_file_path=None, rank=None, world_size=None, image_url=None, preloaded_image_num=1):
         self.data = load_json(dataset_file_path)
         self.dataset_name = dataset_name
-        self.calculator = BaseCalculator
-        self.estimator = BaseEstimator
         self.image_url = image_url
         self.preloaded_image_num = preloaded_image_num
         if rank is not None and world_size is not None:
@@ -62,43 +62,70 @@ class Dataset(object):
             sample['prompt_instruction'] = f"{translate_prompt('Hint: ', language)}{sample['hint']}\n" + sample['prompt_instruction']
         return sample
 
-    def calculate(self, data, filtered_response, is_filtered, question_type, request_type, calculate_type):
-        question_type = opt_or_base_type(question_type, data.get('question_type', 'open'))
-        request_type = opt_or_base_type(request_type, data.get('request_type', 'open'))
+    @abstractmethod
+    def preprocess_calculate_kwargs(self, base_kwargs, **kwargs):
+        raise NotImplementedError
+
+    def is_overridden_preprocess_calculate_kwargs(self, obj):
+        return Dataset.__dict__['preprocess_calculate_kwargs'] is not obj.preprocess_calculate_kwargs.__func__
+
+    def caculate(self, data, filtered_response, is_filtered, question_type, request_type, calculate_func, **inner_kwargs):
         base_calculate_kwargs = {
             'filtered_r': filtered_response,
             'is_filtered': is_filtered,
             'gold': data['gold']
         }
+        if self.is_overridden_preprocess_calculate_kwargs(self):
+            base_calculate_kwargs = self.preprocess_calculate_kwargs(base_calculate_kwargs)
+
+        ## 如果用户有传就用传的 ##
+        ## --eval_args calculate_func=xxx
+        if calculate_func is not None:
+            calculate_core = getattr(
+                importlib.import_module(f'dataloaders.calculators'),
+                calculate_func
+            )
+            return calculate_core(**base_calculate_kwargs, **inner_kwargs)
+
+        ## 如果用户有定义 ##
+        if question_type is None:
+            question_type = data.get('question_type', 'open')
+        if request_type is None:
+            request_type = data.get('request_type', 'open')
+
         if question_type == 'multiple_choice':
             if request_type == 'loglikelihood':
-                metric2score, filtered_base_dict = getattr(self.calculator, opt_or_base_type(calculate_type, 'loglikelihood'))(
+                metric2score, filtered_base_dict = loglikelihood(
                     **base_calculate_kwargs,
                     choices_length=[len(i) for i in data.get('choices', data.get('prompt_choices', None))],
-                    prompt_choices=data['prompt_choices']
+                    prompt_choices=data['prompt_choices'],
+                    **inner_kwargs
                 )
             else:
-                metric2score = getattr(self.calculator, opt_or_base_type(calculate_type, 'multiple_choice'))(**base_calculate_kwargs)
+                metric2score = multiple_choice(**base_calculate_kwargs, **inner_kwargs)
 
         elif question_type == 'open':
-            gold = base_calculate_kwargs['gold']
-            if isinstance(gold, int) and 'prompt_choices' in data.keys():
-                gold = data['prompt_choices'][gold]
-            metric2score = getattr(self.calculator, opt_or_base_type(calculate_type, 'exact_match'))(
-                filtered_r=base_calculate_kwargs['filtered_r'],
-                gold=gold,
+            metric2score = exact_match(
+                **{k: base_calculate_kwargs[k] for k in ['filtered_r', 'gold']},
                 max_to_0_1=True,
-                **EXTRACTMATCH.get(data['name'], {})
+                **EXACT_MATCH.get(data['name'], {}),
+                **inner_kwargs
             )
-
         elif question_type == 'yes_or_no':
-            metric2score = getattr(self.calculator, opt_or_base_type(calculate_type, 'multiple_choice'))(**base_calculate_kwargs)
+            metric2score = multiple_choice(**base_calculate_kwargs, **inner_kwargs)
+
         else:
             raise NotImplementedError(f'Unknown question_type: {question_type}')
 
         return metric2score
 
-    def estimate(self, scores, categories, sub_categories):
-        return self.estimator.sum_or_avg(scores, categories=categories, sub_categories=sub_categories, e_type='avg')
+    def estimate(self, scores, categories, sub_categories, estimate_func, **inner_kwargs):
+        if estimate_func is not None:
+            estimate_core = getattr(
+                importlib.import_module(f'dataloaders.estimators'),
+                estimate_func
+            )
+            return estimate_core(scores, categories=categories, sub_categories=sub_categories, **inner_kwargs)
+        return sum_or_avg(scores, categories=categories, sub_categories=sub_categories, e_type='avg', **inner_kwargs)
 
 data_core = Dataset

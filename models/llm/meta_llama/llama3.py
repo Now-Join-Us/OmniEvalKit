@@ -13,7 +13,7 @@ class LLaMA3Base(ModelWrapper):
         )
 
     def generate_text_only(self, conversation, **kwargs):
-        outputs = pipeline(conversation)
+        outputs = pipeline(conversation, max_new_tokens=512)
         return outputs[0]["generated_text"]
 
 model_core = LLaMA3Base

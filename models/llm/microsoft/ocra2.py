@@ -11,7 +11,7 @@ class Orca2(ModelWrapper):
         prompt = f"<|im_start|>system\n{system_message}<|im_end|>\n<|im_start|>user\n{conversation}<|im_end|>\n<|im_start|>assistant"
 
         inputs = self.tokenizer(prompt, return_tensors='pt')
-        output_ids = self.model.generate(inputs["input_ids"].to(self.model.device),)
+        output_ids = self.model.generate(inputs["input_ids"].to(self.model.device), max_new_tokens=512)
         response = self.tokenizer.batch_decode(output_ids)[0]
 
         return response

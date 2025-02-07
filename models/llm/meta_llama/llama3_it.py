@@ -24,7 +24,7 @@ class LLaMA3Instruct(ModelWrapper):
 
         outputs = self.model.generate(
             input_ids,
-            max_new_tokens=128,
+            max_new_tokens=512,
             eos_token_id=terminators,
             do_sample=True,
             temperature=0.6,
