@@ -87,6 +87,7 @@ _MODULE2MODEL = {
     'llm.alibaba_nlp.gte_qwen2_it': ['gte-Qwen2-7B-instruct', 'gte-Qwen2-1.5B-instruct'],
     'llm.microsoft.gtl_delta': ['LLaMA-2-7b-GTL-Delta'],
     'llm.test_llm': ['TestLLM'],
+    'llm.qwen.deepseek_r1_distill_qwen': ['DeepSeek-R1-Distill-Qwen-7B']
 }
 
 _MODULE2DATASET = {
